@@ -1,11 +1,12 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Share2 } from "lucide-react";
+import { ArrowLeft, Share2, Download, AlertCircle } from "lucide-react";
 import { ClaimsList } from "@/components/ClaimsList";
 import { SourceCard } from "@/components/SourceCard";
 import { ReactFlowGraph } from "@/components/ReactFlowGraph";
 import { MetricsCircles } from "@/components/MetricsCircles";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ShareCard } from "@/components/ShareCard";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -14,6 +15,11 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+} from "@/components/ui/alert";
 
 import { AnalysisResult, GraphNode, GraphEdge } from "@/lib/types";
 import { toast } from "sonner";
@@ -26,6 +32,7 @@ const Results = () => {
   const navigate = useNavigate();
   const result: AnalysisResult = location.state?.result;
   const originalQuery = location.state?.originalQuery;
+  const [showShareCard, setShowShareCard] = useState(false);
   
 
   // Scroll animations for each section
@@ -91,70 +98,102 @@ const Results = () => {
   );
 
   const handleShare = useCallback(() => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url);
-    toast.success("Link copied to clipboard");
+    setShowShareCard(true);
   }, []);
 
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
-      <header className="border-b border-border/50 bg-card/50 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
-        <div className="container mx-auto px-6 py-4">
-          <div className="flex items-center justify-between mb-4">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate("/")}
-            className="gap-2 hover:bg-primary/10"
-          >
-            <ArrowLeft className="h-4 w-4" />
-            New Search
-          </Button>
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Grounded" className="h-7 w-7" />
-            {originalQuery && /^https?:\/\//i.test(originalQuery) ? (
-              <a
-                href={originalQuery}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
-              >
-                Grounded Report
-              </a>
-            ) : (
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-                Grounded Report
-              </h1>
-            )}
-          </div>
-          <div className="flex items-center gap-2">
-            <ThemeToggle />
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleShare}
-              className="gap-2 hover:bg-primary/10 hover:border-primary/50"
-            >
-              <Share2 className="h-4 w-4" />
-              Share
-            </Button>
-          </div>
-          </div>
-          <Breadcrumb>
-            <BreadcrumbList>
-              <BreadcrumbItem>
-                <BreadcrumbLink href="/">Home</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Results</BreadcrumbPage>
-              </BreadcrumbItem>
-            </BreadcrumbList>
-          </Breadcrumb>
-        </div>
-      </header>
+  const handleDownloadReport = useCallback(() => {
+    const dataStr = JSON.stringify(result, null, 2);
+    const dataBlob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(dataBlob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `grounded-report-${Date.now()}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+    toast.success("Report downloaded");
+  }, [result]);
 
-      <main className="container mx-auto px-6 py-8 space-y-10">
+  return (
+    <>
+      {showShareCard && <ShareCard result={result} onClose={() => setShowShareCard(false)} />}
+      
+      <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
+        <header className="border-b border-border/50 bg-card/50 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
+          <div className="container mx-auto px-6 py-4">
+            <div className="flex items-center justify-between mb-4">
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => navigate("/")}
+                className="gap-2 hover:bg-primary/10"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                New Search
+              </Button>
+              <div className="flex items-center gap-3">
+                <img src={logo} alt="Grounded" className="h-7 w-7" />
+                {originalQuery && /^https?:\/\//i.test(originalQuery) ? (
+                  <a
+                    href={originalQuery}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+                  >
+                    Grounded Report
+                  </a>
+                ) : (
+                  <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                    Grounded Report
+                  </h1>
+                )}
+              </div>
+              <div className="flex items-center gap-2">
+                <ThemeToggle />
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleDownloadReport}
+                  className="gap-2 hover:bg-primary/10 hover:border-primary/50"
+                >
+                  <Download className="h-4 w-4" />
+                  Export JSON
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleShare}
+                  className="gap-2 hover:bg-primary/10 hover:border-primary/50"
+                >
+                  <Share2 className="h-4 w-4" />
+                  Share
+                </Button>
+              </div>
+            </div>
+            <Breadcrumb>
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Results</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+          </div>
+        </header>
+
+        <main className="container mx-auto px-6 py-8 space-y-10">
+          {/* Extraction Status Alert */}
+          {result.extraction_metadata && !result.extraction_metadata.content_extracted && (
+            <Alert className="bg-yellow-500/10 border-yellow-500/20">
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>Limited Analysis</AlertTitle>
+              <AlertDescription>
+                Unable to extract full article content. Analysis may be less detailed.
+              </AlertDescription>
+            </Alert>
+          )}
         {/* Metrics - Show First */}
         <section 
           ref={metricsAnimation.ref}
@@ -209,18 +248,20 @@ const Results = () => {
               : 'opacity-0 translate-y-8'
           }`}
         >
-          <div className="grid lg:grid-cols-2 gap-8">
-            <div className="space-y-4">
+          <div className="grid lg:grid-cols-[350px_1fr] gap-8">
+            <div className="space-y-4 order-2 lg:order-1">
               <h3 className="text-xl font-semibold">Source Tree</h3>
-              <ReactFlowGraph nodes={nodes} edges={edges} claims={result.claims} />
+              <div className="lg:sticky lg:top-24">
+                <ReactFlowGraph nodes={nodes} edges={edges} claims={result.claims} />
+              </div>
             </div>
 
             {/* Sources */}
-            <div className="space-y-4">
+            <div className="space-y-4 order-1 lg:order-2">
               <h3 className="text-xl font-semibold">
                 Sources ({validSources.length})
               </h3>
-              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+              <div className="space-y-4 max-h-[600px] lg:max-h-[800px] overflow-y-auto pr-2">
                 {validSources.map((source, idx) => (
                   <SourceCard
                     key={idx}
@@ -240,6 +281,7 @@ const Results = () => {
         </section>
       </main>
     </div>
+    </>
   );
 };
 

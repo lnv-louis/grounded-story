@@ -1,84 +1,134 @@
 import { Source } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
-import { getSourceCategoryIcon, formatDate } from "@/lib/formatters";
+import { ExternalLink, CheckCircle2, AlertCircle, XCircle } from "lucide-react";
+import { formatDate } from "@/lib/formatters";
 
 interface SourceCardProps {
   source: Source;
-  citations?: { excerpt: string; rationale?: string; page_number?: string }[];
+  citations: Array<{
+    excerpt: string;
+    rationale?: string;
+    page_number?: string;
+  }>;
 }
 
-export const SourceCard = ({ source, citations }: SourceCardProps) => {
-  const typeColor = {
-    primary: "bg-green-500/10 text-green-400 border-green-500/20",
-    secondary: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
-    tertiary: "bg-orange-500/10 text-orange-400 border-orange-500/20",
-  }[source.source_type];
+const getTypeColor = (type: 'primary' | 'secondary' | 'tertiary') => {
+  switch (type) {
+    case 'primary':
+      return 'bg-green-500/10 text-green-400 border-green-500/20';
+    case 'secondary':
+      return 'bg-yellow-500/10 text-yellow-400 border-yellow-500/20';
+    case 'tertiary':
+      return 'bg-orange-500/10 text-orange-400 border-orange-500/20';
+  }
+};
 
-  const CategoryIcon = getSourceCategoryIcon(source.category);
+const getUrlValidityBadge = (url: string, urlValid?: boolean) => {
+  if (!url || url.trim() === '') {
+    return (
+      <Badge variant="outline" className="bg-gray-500/10 text-gray-400 border-gray-500/20 gap-1">
+        <XCircle className="h-3 w-3" />
+        No URL
+      </Badge>
+    );
+  }
+  
+  if (urlValid === false) {
+    return (
+      <Badge variant="outline" className="bg-red-500/10 text-red-400 border-red-500/20 gap-1">
+        <AlertCircle className="h-3 w-3" />
+        Invalid Link
+      </Badge>
+    );
+  }
+  
+  if (urlValid === true) {
+    return (
+      <Badge variant="outline" className="bg-green-500/10 text-green-400 border-green-500/20 gap-1">
+        <CheckCircle2 className="h-3 w-3" />
+        Verified
+      </Badge>
+    );
+  }
+  
+  return null;
+};
+
+export const SourceCard = ({ source, citations }: SourceCardProps) => {
+  const hasValidUrl = source.url && source.url.trim() !== '' && source.url_valid !== false;
 
   return (
-    <Card className="p-4 bg-card/50 border-border/50 hover:border-primary/30 transition-all group">
-      {source.image_url && (
-        <div className="mb-3 -mx-4 -mt-4 overflow-hidden rounded-t-lg">
-          <img 
-            src={source.image_url} 
-            alt={source.outlet_name}
-            className="w-full h-32 object-cover group-hover:scale-105 transition-transform duration-300"
-          />
+    <Card className="p-4 bg-card/50 border-border/50 hover:border-primary/30 transition-all">
+      <div className="space-y-3">
+        {/* Source Header */}
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2 mb-1 flex-wrap">
+              {hasValidUrl ? (
+                <a
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="font-semibold text-foreground hover:text-primary transition-colors flex items-center gap-1 group"
+                >
+                  {source.outlet_name}
+                  <ExternalLink className="h-3 w-3 opacity-0 group-hover:opacity-100 transition-opacity" />
+                </a>
+              ) : (
+                <span className="font-semibold text-foreground">{source.outlet_name}</span>
+              )}
+              {getUrlValidityBadge(source.url, source.url_valid)}
+            </div>
+            {source.category && (
+              <p className="text-xs text-muted-foreground">{source.category}</p>
+            )}
+          </div>
+          <div className="flex flex-col items-end gap-1">
+            <Badge variant="outline" className={getTypeColor(source.source_type)}>
+              {source.source_type}
+            </Badge>
+            {source.political_lean && (
+              <Badge 
+                variant="outline" 
+                className={
+                  source.political_lean === 'left' 
+                    ? 'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                    : source.political_lean === 'right'
+                    ? 'bg-red-500/10 text-red-400 border-red-500/20'
+                    : 'bg-purple-500/10 text-purple-400 border-purple-500/20'
+                }
+              >
+                {source.political_lean}
+              </Badge>
+            )}
+          </div>
         </div>
-      )}
-      <div className="flex items-start justify-between mb-3">
-        <div className="flex-1">
-          <h4 className="font-semibold text-foreground mb-1">{source.outlet_name}</h4>
-          {source.publish_date && (
-            <p className="text-xs text-muted-foreground">
-              {formatDate(source.publish_date)}
-            </p>
-          )}
-        </div>
-        <a
-          href={source.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-primary hover:text-primary/80 transition-colors"
-        >
-          <ExternalLink className="h-4 w-4" />
-        </a>
-      </div>
 
-      <div className="flex gap-2 mb-3 flex-wrap">
-        <Badge variant="outline" className={typeColor}>
-          {source.source_type}
-        </Badge>
-        {source.category && (
-          <Badge variant="outline" className="bg-muted/50 text-muted-foreground border-border/50 flex items-center gap-1">
-            <CategoryIcon className="h-3 w-3" />
-            {source.category}
-          </Badge>
+        {/* Publish Date */}
+        {source.publish_date && (
+          <p className="text-xs text-muted-foreground">
+            Published {formatDate(source.publish_date)}
+          </p>
+        )}
+
+        {/* Citations */}
+        {citations.length > 0 && (
+          <div className="space-y-2 pt-2 border-t border-border/30">
+            <p className="text-xs font-medium text-muted-foreground">
+              {citations.length} Citation{citations.length !== 1 ? 's' : ''}
+            </p>
+            {citations.map((citation, idx) => (
+              <div key={idx} className="text-xs space-y-1 pl-3 border-l-2 border-primary/20">
+                <p className="text-foreground/90 italic">"{citation.excerpt}"</p>
+                {citation.rationale && (
+                  <p className="text-muted-foreground">{citation.rationale}</p>
+                )}
+              </div>
+            ))}
+          </div>
         )}
       </div>
-
-      {citations && citations.length > 0 && (
-        <div className="space-y-2 mt-3 pt-3 border-t border-border/30">
-          {citations.map((citation, idx) => (
-            <div key={idx} className="text-sm">
-              <p className="text-muted-foreground italic">"{citation.excerpt}"</p>
-              {citation.page_number && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  Page {citation.page_number}
-                </p>
-              )}
-              {citation.rationale && (
-                <p className="text-xs text-muted-foreground mt-1">
-                  {citation.rationale}
-                </p>
-              )}
-            </div>
-          ))}
-        </div>
-      )}
     </Card>
   );
 };

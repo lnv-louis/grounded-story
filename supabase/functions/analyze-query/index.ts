@@ -6,24 +6,61 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Function to validate if a URL is reachable
+async function validateUrl(url: string): Promise<boolean> {
+  try {
+    if (!url || url.trim() === '') return false;
+    
+    // Basic URL format validation
+    const urlPattern = /^https?:\/\/.+\..+/;
+    if (!urlPattern.test(url)) return false;
+    
+    // Try to fetch with HEAD request (faster than GET)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5 second timeout
+    
+    const response = await fetch(url, {
+      method: 'HEAD',
+      signal: controller.signal,
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (compatible; GroundedBot/1.0)'
+      }
+    });
+    
+    clearTimeout(timeoutId);
+    
+    // Consider 200-399 as valid, and some 403s (some sites block HEAD requests)
+    return response.status < 400 || response.status === 403;
+  } catch (error) {
+    // URL is invalid or unreachable
+    return false;
+  }
+}
+
 // Function to fetch and extract article content
-async function fetchArticleContent(url: string): Promise<{ headline: string; content: string } | null> {
+async function fetchArticleContent(url: string): Promise<{ headline: string; content: string; fetchSuccess: boolean } | null> {
   try {
     console.log('Fetching article from:', url);
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 second timeout
+    
     const response = await fetch(url, {
+      signal: controller.signal,
       headers: {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
       }
     });
     
+    clearTimeout(timeoutId);
+    
     if (!response.ok) {
       console.error('Failed to fetch article:', response.status);
-      return null;
+      return { headline: '', content: '', fetchSuccess: false };
     }
 
     const html = await response.text();
     const doc = new DOMParser().parseFromString(html, 'text/html');
-    if (!doc) return null;
+    if (!doc) return { headline: '', content: '', fetchSuccess: false };
 
     // Try to extract headline
     let headline = '';
@@ -76,10 +113,10 @@ async function fetchArticleContent(url: string): Promise<{ headline: string; con
 
     console.log(`Extracted - Headline: "${headline.substring(0, 100)}", Content length: ${content.length} chars`);
     
-    return content.length > 100 ? { headline, content } : null;
+    return content.length > 100 ? { headline, content, fetchSuccess: true } : { headline, content: '', fetchSuccess: false };
   } catch (error) {
     console.error('Error fetching article:', error);
-    return null;
+    return { headline: '', content: '', fetchSuccess: false };
   }
 }
 
@@ -105,18 +142,21 @@ serve(async (req) => {
     // Detect if input is a URL
     const isUrl = /^https?:\/\//i.test(query.trim());
     
-    let articleData: { headline: string; content: string } | null = null;
+    let articleData: { headline: string; content: string; fetchSuccess: boolean } | null = null;
     let actualContent = query;
+    let extractionSuccess = false;
     
     // If it's a URL, fetch and extract the article content
     if (isUrl) {
       articleData = await fetchArticleContent(query);
-      if (articleData && articleData.content) {
+      if (articleData && articleData.fetchSuccess && articleData.content) {
         actualContent = `Article URL: ${query}\n\nHeadline: ${articleData.headline}\n\nArticle Content:\n${articleData.content}`;
+        extractionSuccess = true;
         console.log('Successfully extracted article content');
       } else {
         console.warn('Failed to extract article content, falling back to URL-only analysis');
         actualContent = query;
+        extractionSuccess = false;
       }
     }
     
@@ -124,15 +164,32 @@ serve(async (req) => {
     const prePrompt = `INPUT TYPE DETECTION:
 ${isUrl ? 
 `The user has provided a URL: ${query}
-${articleData ? 
+${extractionSuccess ? 
   `I have successfully fetched and extracted the full article content including the headline and body text.
   CRITICAL: You MUST use the EXACT headline provided below. DO NOT create your own headline.
-  CRITICAL: Analyze ONLY the claims made IN the article content itself, NOT claims about the news sources.` 
+  CRITICAL: Analyze ONLY the claims made IN the article content itself, NOT claims about the news sources.
+  CRITICAL: For ALL URLs you provide in sources, citations, and source chains:
+  - ONLY include URLs that you have VERIFIED exist and are accessible
+  - DO NOT make up or invent any URLs
+  - DO NOT create plausible-looking URLs that might not exist
+  - If you don't have a verified URL for a source, leave the url field EMPTY ("")
+  - It is BETTER to have an empty URL than a fake/made-up URL
+  - VERIFY: Does this URL actually exist before including it
+  Example WRONG: "https://www.reformparty.uk/news" (made up)
+  Example RIGHT: Leave url as "" if you can't verify it exists` 
   : 
-  `I was unable to fetch the article content directly. Please use your web search capabilities to find and analyze the article.`}` 
+  `I was unable to fetch the article content directly. Please use your web search capabilities to find and analyze the article.
+  CRITICAL WARNING about URLs:
+  - ONLY include URLs you can VERIFY are real and accessible
+  - DO NOT invent or make up URLs
+  - If uncertain about a URL, leave it EMPTY ("")`}` 
 : 
 `The user has provided text/topic: ${query}
-Analyze this topic by searching for the most relevant recent articles and sources.`}
+Analyze this topic by searching for the most relevant recent articles and sources.
+CRITICAL WARNING about URLs:
+- ONLY provide URLs that you have verified exist
+- DO NOT make up plausible-looking URLs
+- Better to omit a URL than provide a fake one`}
 
 ANALYSIS REQUIREMENTS:
 You must comprehensively analyze the content for factual accuracy, bias, and clickbait characteristics.`;
@@ -346,6 +403,45 @@ CRITICAL RULES:
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
+
+    // Deduplicate sources
+    const seenUrls = new Set<string>();
+    const seenNames = new Set<string>();
+    const uniqueSources = [];
+    
+    for (const source of (analysisData.sources || [])) {
+      const key = `${source.outlet_name.toLowerCase()}_${source.url || ''}`;
+      const nameKey = source.outlet_name.toLowerCase();
+      
+      if (!seenUrls.has(key) && !seenNames.has(nameKey)) {
+        seenUrls.add(key);
+        seenNames.add(nameKey);
+        uniqueSources.push(source);
+      }
+    }
+    
+    analysisData.sources = uniqueSources;
+    
+    // Validate all URLs in sources
+    console.log('Validating source URLs...');
+    for (const source of analysisData.sources) {
+      if (source.url && source.url.trim() !== '') {
+        const isValid = await validateUrl(source.url);
+        source.url_valid = isValid;
+        if (!isValid) {
+          console.warn(`Invalid/unreachable URL: ${source.url}`);
+        }
+      } else {
+        source.url_valid = false;
+      }
+    }
+    
+    // Add metadata about extraction
+    analysisData.extraction_metadata = {
+      content_extracted: extractionSuccess,
+      original_url: isUrl ? query : null,
+      extraction_timestamp: new Date().toISOString()
+    };
 
     return new Response(
       JSON.stringify(analysisData),

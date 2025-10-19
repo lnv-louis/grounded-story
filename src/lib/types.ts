@@ -13,6 +13,7 @@ export const SourceSchema = z.object({
   url: z.string().refine((val) => val === "" || z.string().url().safeParse(val).success, {
     message: "Invalid URL",
   }),
+  url_valid: z.boolean().optional(),
   publish_date: z.string().nullable().optional(),
   political_lean: z.enum(['left', 'center', 'right']).optional(),
   source_type: z.enum(['primary', 'secondary', 'tertiary']),
@@ -64,6 +65,11 @@ export const AnalysisResultSchema = z.object({
   citations: z.array(CitationSchema),
   edges: z.array(EdgeSchema),
   metrics: MetricsSchema,
+  extraction_metadata: z.object({
+    content_extracted: z.boolean(),
+    original_url: z.string().nullable(),
+    extraction_timestamp: z.string(),
+  }).optional(),
 });
 
 export type Claim = z.infer<typeof ClaimSchema>;
