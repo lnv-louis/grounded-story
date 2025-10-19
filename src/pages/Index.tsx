@@ -81,7 +81,7 @@ const Index = () => {
             <img src={logo} alt="Grounded" className="h-8 w-8" />
             <span className="text-2xl font-bold">Grounded</span>
           </div>
-          <div className="flex gap-4">
+          <div className="flex gap-4 items-center">
             <Button
               variant="ghost"
               size="sm"

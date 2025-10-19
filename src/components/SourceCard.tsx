@@ -2,6 +2,7 @@ import { Source } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { getSourceCategoryIcon, formatDate } from "@/lib/formatters";
 
 interface SourceCardProps {
   source: Source;
@@ -14,6 +15,8 @@ export const SourceCard = ({ source, citations }: SourceCardProps) => {
     secondary: "bg-yellow-500/10 text-yellow-400 border-yellow-500/20",
     tertiary: "bg-orange-500/10 text-orange-400 border-orange-500/20",
   }[source.source_type];
+
+  const CategoryIcon = getSourceCategoryIcon(source.category);
 
   return (
     <Card className="p-4 bg-card/50 border-border/50 hover:border-primary/30 transition-all group">
@@ -31,7 +34,7 @@ export const SourceCard = ({ source, citations }: SourceCardProps) => {
           <h4 className="font-semibold text-foreground mb-1">{source.outlet_name}</h4>
           {source.publish_date && (
             <p className="text-xs text-muted-foreground">
-              {new Date(source.publish_date).toLocaleDateString()}
+              {formatDate(source.publish_date)}
             </p>
           )}
         </div>
@@ -45,12 +48,13 @@ export const SourceCard = ({ source, citations }: SourceCardProps) => {
         </a>
       </div>
 
-      <div className="flex gap-2 mb-3">
+      <div className="flex gap-2 mb-3 flex-wrap">
         <Badge variant="outline" className={typeColor}>
           {source.source_type}
         </Badge>
         {source.category && (
-          <Badge variant="outline" className="bg-muted/50 text-muted-foreground border-border/50">
+          <Badge variant="outline" className="bg-muted/50 text-muted-foreground border-border/50 flex items-center gap-1">
+            <CategoryIcon className="h-3 w-3" />
             {source.category}
           </Badge>
         )}

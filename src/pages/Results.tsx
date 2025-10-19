@@ -5,6 +5,7 @@ import { ClaimsList } from "@/components/ClaimsList";
 import { SourceCard } from "@/components/SourceCard";
 import { MindmapGraph } from "@/components/MindmapGraph";
 import { MetricsCircles } from "@/components/MetricsCircles";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { AnalysisResult, GraphNode, GraphEdge } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
@@ -86,35 +87,40 @@ const Results = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background">
-      <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm sticky top-0 z-50">
+    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
+      <header className="border-b border-border/50 bg-card/50 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => navigate("/")}
-            className="gap-2"
+            className="gap-2 hover:bg-primary/10"
           >
             <ArrowLeft className="h-4 w-4" />
             New Search
           </Button>
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="Grounded" className="h-6 w-6" />
-            <h1 className="text-xl font-bold">Grounded Report</h1>
+          <div className="flex items-center gap-3">
+            <img src={logo} alt="Grounded" className="h-7 w-7" />
+            <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+              Grounded Report
+            </h1>
           </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleShare}
-            className="gap-2"
-          >
-            <Share2 className="h-4 w-4" />
-            Share
-          </Button>
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleShare}
+              className="gap-2 hover:bg-primary/10 hover:border-primary/50"
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </Button>
+          </div>
         </div>
       </header>
 
-      <main className="container mx-auto px-6 py-8 space-y-8">
+      <main className="container mx-auto px-6 py-8 space-y-10">
         {/* Metrics - Show First */}
         <section 
           className={`transition-all duration-500 ${
@@ -157,44 +163,43 @@ const Results = () => {
           <ClaimsList claims={result.claims} sources={validSources} />
         </section>
 
-        {/* Source Cards */}
+        {/* Two Column Layout - Source Tree & Sources */}
         <section 
           className={`transition-all duration-500 ${
-            visibleSections.has('sources') 
+            visibleSections.has('sources') || visibleSections.has('graph')
               ? 'opacity-100 translate-y-0' 
               : 'opacity-0 translate-y-4'
           }`}
         >
-          <h3 className="text-xl font-semibold mb-4">
-            Sources ({validSources.length})
-          </h3>
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {validSources.map((source, idx) => (
-              <SourceCard
-                key={idx}
-                source={source}
-                citations={result.citations
-                  .filter(c => c.source_index === idx)
-                  .map(c => ({
-                    excerpt: c.excerpt,
-                    rationale: c.rationale,
-                    page_number: c.page_number,
-                  }))}
-              />
-            ))}
-          </div>
-        </section>
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Source Tree (Mindmap) */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold">Source Tree</h3>
+              <MindmapGraph nodes={nodes} edges={edges} />
+            </div>
 
-        {/* Mindmap Graph */}
-        <section 
-          className={`transition-all duration-500 ${
-            visibleSections.has('graph') 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-4'
-          }`}
-        >
-          <h3 className="text-xl font-semibold mb-4">Relationship Mindmap</h3>
-          <MindmapGraph nodes={nodes} edges={edges} />
+            {/* Sources */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold">
+                Sources ({validSources.length})
+              </h3>
+              <div className="space-y-4 max-h-[500px] overflow-y-auto pr-2">
+                {validSources.map((source, idx) => (
+                  <SourceCard
+                    key={idx}
+                    source={source}
+                    citations={result.citations
+                      .filter(c => c.source_index === idx)
+                      .map(c => ({
+                        excerpt: c.excerpt,
+                        rationale: c.rationale,
+                        page_number: c.page_number,
+                      }))}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
         </section>
       </main>
     </div>
