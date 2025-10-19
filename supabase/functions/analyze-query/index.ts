@@ -220,15 +220,28 @@ ANALYSIS FRAMEWORK:
    - Additional claims should still be factual and important, just less central
    - Aim for 8-12 total claims when possible
 
-3. SOURCE TRACING (Critical)
-   - For EACH claim, find the original source(s)
-   - Trace the information chain: "Claim → Article A → Report B → Organization C"
+3. SOURCE TRACING (Critical - Dig Deeper)
+   - For EACH claim, identify the ULTIMATE PRIMARY SOURCE of the information
+   - DO NOT stop at the news outlet that reported it - trace back further
+   - Example: If Foreign Policy reports trade statistics, find the ORIGINAL source:
+     * Chinese Customs data, US Census Bureau, World Trade Organization, etc.
+   - Trace the complete information chain: "Primary Data Source → Report/Study → News Article"
+   - When a news outlet cites statistics, research, or official data:
+     * FIND the original government agency, research institution, or database
+     * DO NOT just list the news outlet - go to the source of the data
    - Classify sources as:
-     * Primary: Original data, court documents, research papers, official statements
-     * Secondary: News reporting with original reporting
-     * Tertiary: Opinion pieces, aggregation, commentary
+     * Primary: Original data sources, court documents, research papers, official government statistics, direct statements from officials
+     * Secondary: News reporting with original investigation/reporting
+     * Tertiary: News aggregation, opinion pieces, commentary
    - Find sources across the political spectrum (left, center, right)
    - Include publish dates and URLs
+   
+   EXAMPLE OF PROPER SOURCE TRACING:
+   ❌ WRONG: "Foreign Policy (secondary)" for trade statistics
+   ✅ CORRECT: "Chinese General Administration of Customs (primary) → Foreign Policy (secondary)"
+   
+   ❌ WRONG: "BBC News (secondary)" for research findings  
+   ✅ CORRECT: "University of Oxford Study (primary) → BBC News (secondary)"
 
 4. FACTUAL ACCURACY METRIC (0-100%)
    Calculate based on:
@@ -298,7 +311,7 @@ REQUIRED JSON OUTPUT:
       "confidence": 0.85,
       "confidence_explanation": "string - brief 1-2 sentence explanation of why this confidence level",
       "position": 1,
-      "source_chain": "string - Format: 'Source Name (type) [url] → Source Name (type) [url]' e.g. 'The Guardian (secondary) [https://...] → YouGov report (primary) [https://...]'"
+      "source_chain": "string - CRITICAL: Trace to PRIMARY sources. Format: 'Primary Source Name (primary) [url] → News Outlet (secondary) [url]'. Example: 'Chinese General Administration of Customs (primary) [https://customs.gov.cn] → Foreign Policy (secondary) [https://...]'. DO NOT stop at news outlets when they cite official data/research."
     }
   ],
   "sources": [
