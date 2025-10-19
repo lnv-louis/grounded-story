@@ -29,7 +29,7 @@ const getUrlValidityBadge = (url: string, urlValid?: boolean) => {
     return (
       <Badge variant="outline" className="bg-gray-500/10 text-gray-400 border-gray-500/20 gap-1">
         <XCircle className="h-3 w-3" />
-        No URL
+        Cited by article
       </Badge>
     );
   }
