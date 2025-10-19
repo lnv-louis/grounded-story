@@ -3,9 +3,10 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Share2 } from "lucide-react";
 import { ClaimsList } from "@/components/ClaimsList";
 import { SourceCard } from "@/components/SourceCard";
-import { MindmapGraph } from "@/components/MindmapGraph";
+import { StaticSourceTree } from "@/components/StaticSourceTree";
 import { MetricsCircles } from "@/components/MetricsCircles";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { ShareModal } from "@/components/ShareModal";
 import { AnalysisResult, GraphNode, GraphEdge } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
@@ -16,7 +17,8 @@ const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const result: AnalysisResult = location.state?.result;
-  const originalQuery = location.state?.originalQuery; // Get original query if it was a URL
+  const originalQuery = location.state?.originalQuery;
+  const [shareModalOpen, setShareModalOpen] = useState(false);
 
   // Scroll animations for each section
   const metricsAnimation = useScrollAnimation();
@@ -72,9 +74,7 @@ const Results = () => {
   ];
 
   const handleShare = () => {
-    const url = window.location.href;
-    navigator.clipboard.writeText(url);
-    toast.success("Link copied to clipboard");
+    setShareModalOpen(true);
   };
 
   return (
@@ -178,10 +178,9 @@ const Results = () => {
           }`}
         >
           <div className="grid lg:grid-cols-2 gap-8">
-            {/* Source Tree (Mindmap) */}
             <div className="space-y-4">
               <h3 className="text-xl font-semibold">Source Tree</h3>
-              <MindmapGraph nodes={nodes} edges={edges} claims={result.claims} />
+              <StaticSourceTree nodes={nodes} edges={edges} claims={result.claims} />
             </div>
 
             {/* Sources */}
@@ -208,6 +207,8 @@ const Results = () => {
           </div>
         </section>
       </main>
+
+      <ShareModal open={shareModalOpen} onOpenChange={setShareModalOpen} result={result} />
     </div>
   );
 };

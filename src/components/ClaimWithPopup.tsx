@@ -3,6 +3,7 @@ import { Claim, Source } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink } from "lucide-react";
+import { formatDate } from "@/lib/formatters";
 
 interface ClaimWithPopupProps {
   claim: Claim;
@@ -90,7 +91,6 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
       
       {sourceChain.length > 0 && (
         <div className="mt-3 pt-3 border-t border-border/30">
-          <p className="text-xs text-muted-foreground font-medium mb-2">Source Chain:</p>
           <div className="flex flex-wrap items-center gap-2">
             {sourceChain.map((source, sIdx) => (
               <div key={sIdx} className="flex items-center gap-2">
@@ -134,7 +134,16 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
             <div className="space-y-3">
               <div className="flex items-start justify-between gap-2">
                 <h4 className="text-sm font-semibold text-primary">Source Traceability</h4>
-                <Badge variant="outline" className="bg-primary/20 text-primary border-primary/30">
+                <Badge 
+                  variant="outline" 
+                  className={
+                    claim.confidence >= 0.8 
+                      ? "bg-green-500/20 text-green-400 border-green-500/30"
+                      : claim.confidence >= 0.6
+                      ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                      : "bg-red-500/20 text-red-400 border-red-500/30"
+                  }
+                >
                   {Math.round(claim.confidence * 100)}% confident
                 </Badge>
               </div>
@@ -173,7 +182,7 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
                             )}
                             {matchedSource.publish_date && (
                               <p className="text-xs text-muted-foreground">
-                                {new Date(matchedSource.publish_date).toLocaleDateString()}
+                                {formatDate(matchedSource.publish_date)}
                               </p>
                             )}
                           </div>
