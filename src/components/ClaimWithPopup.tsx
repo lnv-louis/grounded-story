@@ -124,13 +124,13 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
       {/* Hover Popup */}
       {showPopup && sourceChain.length > 0 && (
         <div
-          className="absolute z-50 pointer-events-none"
+          className="fixed z-[100] pointer-events-none"
           style={{
             left: `${popupPosition.x + 20}px`,
             top: `${popupPosition.y + 20}px`,
           }}
         >
-          <Card className="p-4 bg-card/95 backdrop-blur-md border-primary/50 shadow-2xl max-w-sm animate-in fade-in zoom-in-95 duration-200">
+          <Card className="p-4 bg-card/95 backdrop-blur-md border-primary/50 shadow-2xl max-w-sm animate-in fade-in zoom-in-95 duration-200 pointer-events-auto">
             <div className="space-y-3">
               <div className="flex items-start justify-between gap-2">
                 <h4 className="text-sm font-semibold text-primary">Source Traceability</h4>
