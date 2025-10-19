@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Search } from "lucide-react";
-import { Textarea } from "@/components/ui/textarea";
+import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
 const SUGGESTIONS = [
@@ -47,27 +47,24 @@ export const SearchBar = ({ onSearch, isLoading }: SearchBarProps) => {
     }
   };
 
-  const textareaHeight = query.split('\n').length > 2 || query.length > 100;
-
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto">
-      <div className={`flex gap-3 ${textareaHeight ? 'flex-col items-stretch' : 'flex-row items-start'}`}>
+      <div className="flex gap-3 items-center">
         <div className="relative flex-1">
-          <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground z-10" />
-          <Textarea
+          <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground z-10" />
+          <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder={placeholder}
             disabled={isLoading}
-            className="min-h-[60px] max-h-[200px] resize-y pl-12 pr-4 pt-3.5 text-lg bg-secondary/50 border-border/50 focus:border-primary/50 transition-all"
-            rows={2}
+            className="h-[60px] pl-12 pr-4 text-lg bg-secondary/50 border-border/50 focus:border-primary/50 transition-all"
           />
         </div>
         <Button
           type="submit"
           disabled={isLoading || !query.trim()}
           size="lg"
-          className={`px-6 shrink-0 ${textareaHeight ? 'w-full h-[50px]' : 'h-[60px]'}`}
+          className="h-[60px] px-6 shrink-0"
         >
           <Search className="h-5 w-5 mr-2" />
           {isLoading ? "Analyzing..." : "Analyze"}
