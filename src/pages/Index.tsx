@@ -107,6 +107,8 @@ const Index = () => {
 
           <div className="text-center text-sm text-muted-foreground">
             Powered by Perplexity Sonar • Multi-perspective analysis • Political spectrum visualization
+            <br />
+            <span className="text-primary">Paste article URLs or social media links for instant verification</span>
           </div>
         </div>
       </main>

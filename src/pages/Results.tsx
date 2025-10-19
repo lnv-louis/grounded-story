@@ -10,33 +10,23 @@ import { AnalysisResult, GraphNode, GraphEdge } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
 import { useState, useEffect } from "react";
+import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const result: AnalysisResult = location.state?.result;
-  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
+
+  // Scroll animations for each section
+  const metricsAnimation = useScrollAnimation();
+  const headlineAnimation = useScrollAnimation();
+  const claimsAnimation = useScrollAnimation();
+  const sourcesAnimation = useScrollAnimation();
 
   useEffect(() => {
     if (!result) {
       navigate("/");
-      return;
     }
-
-    // Animate sections appearing one by one
-    const sections = ['metrics', 'headline', 'claims', 'sources', 'graph'];
-    let index = 0;
-    
-    const interval = setInterval(() => {
-      if (index < sections.length) {
-        setVisibleSections(prev => new Set([...prev, sections[index]]));
-        index++;
-      } else {
-        clearInterval(interval);
-      }
-    }, 150);
-
-    return () => clearInterval(interval);
   }, [result, navigate]);
 
   if (!result) {
@@ -123,10 +113,11 @@ const Results = () => {
       <main className="container mx-auto px-6 py-8 space-y-10">
         {/* Metrics - Show First */}
         <section 
-          className={`transition-all duration-500 ${
-            visibleSections.has('metrics') 
+          ref={metricsAnimation.ref}
+          className={`transition-all duration-700 ${
+            metricsAnimation.isVisible
               ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-4'
+              : 'opacity-0 translate-y-8'
           }`}
         >
           <h3 className="text-xl font-semibold mb-6">Analysis Metrics</h3>
@@ -135,10 +126,11 @@ const Results = () => {
 
         {/* Headline */}
         <section 
-          className={`transition-all duration-500 ${
-            visibleSections.has('headline') 
+          ref={headlineAnimation.ref}
+          className={`transition-all duration-700 ${
+            headlineAnimation.isVisible
               ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-4'
+              : 'opacity-0 translate-y-8'
           }`}
         >
           <h2 className="text-3xl font-bold mb-2">{result.headline}</h2>
@@ -153,10 +145,11 @@ const Results = () => {
 
         {/* Key Claims */}
         <section 
-          className={`transition-all duration-500 ${
-            visibleSections.has('claims') 
+          ref={claimsAnimation.ref}
+          className={`transition-all duration-700 ${
+            claimsAnimation.isVisible
               ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-4'
+              : 'opacity-0 translate-y-8'
           }`}
         >
           <h3 className="text-xl font-semibold mb-4">Key Claims</h3>
@@ -165,10 +158,11 @@ const Results = () => {
 
         {/* Two Column Layout - Source Tree & Sources */}
         <section 
-          className={`transition-all duration-500 ${
-            visibleSections.has('sources') || visibleSections.has('graph')
+          ref={sourcesAnimation.ref}
+          className={`transition-all duration-700 ${
+            sourcesAnimation.isVisible
               ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-4'
+              : 'opacity-0 translate-y-8'
           }`}
         >
           <div className="grid lg:grid-cols-2 gap-8">
