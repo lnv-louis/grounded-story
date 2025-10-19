@@ -130,7 +130,7 @@ const Index = () => {
         <div className="w-full max-w-4xl space-y-8">
           <div className="text-center space-y-4">
             <h1 className="text-5xl font-bold text-foreground">
-              trace the story to its source
+              Trace the story to its source.
             </h1>
           </div>
 

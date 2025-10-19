@@ -64,7 +64,7 @@ export const ShareCard = ({ result, onClose }: ShareCardProps) => {
               <img src={logo} alt="Grounded" className="h-10 w-10" />
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Grounded Report</h1>
-                <p className="text-sm text-muted-foreground">trace the story to its source</p>
+                <p className="text-sm text-muted-foreground">Trace the story to its source.</p>
               </div>
             </div>
             <div className="text-right">
