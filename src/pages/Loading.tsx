@@ -58,29 +58,36 @@ const Loading = () => {
   useEffect(() => {
     if (error) return;
 
-    const animateBar = (key: keyof typeof progressBars, delay: number, duration: number) => {
+    const animateBar = (key: keyof typeof progressBars, delay: number, duration: number, maxProgress: number = 100) => {
       setTimeout(() => {
         const startTime = Date.now();
         const interval = setInterval(() => {
           const elapsed = Date.now() - startTime;
-          const progress = Math.min((elapsed / duration) * 100, 100);
+          const progress = Math.min((elapsed / duration) * maxProgress, maxProgress);
           
           setProgressBars(prev => ({ ...prev, [key]: progress }));
           
-          if (progress >= 100) {
+          if (progress >= maxProgress) {
             clearInterval(interval);
           }
         }, 16); // ~60fps
       }, delay);
     };
 
-    // Stagger the progress bars
-    animateBar('analyzing', 0, 1000);
-    animateBar('fetching', 400, 1500);
-    animateBar('extracting', 900, 1200);
-    animateBar('computing', 1500, 1000);
-    animateBar('building', 2100, 800);
+    // Stagger the progress bars - first 4 complete normally, last one waits for API
+    animateBar('analyzing', 0, 1500);
+    animateBar('fetching', 500, 2000);
+    animateBar('extracting', 1200, 2500);
+    animateBar('computing', 2000, 2000);
+    animateBar('building', 3000, 3000, 95); // Only goes to 95%, waits for API
   }, [error]);
+
+  // Complete the last progress bar when API is done
+  useEffect(() => {
+    if (isApiComplete && progressBars.building < 100) {
+      setProgressBars(prev => ({ ...prev, building: 100 }));
+    }
+  }, [isApiComplete, progressBars.building]);
 
   // Navigate when both API and animations are complete
   useEffect(() => {

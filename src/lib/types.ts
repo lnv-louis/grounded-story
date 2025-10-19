@@ -9,12 +9,16 @@ export const ClaimSchema = z.object({
 
 export const SourceSchema = z.object({
   outlet_name: z.string(),
-  url: z.string().url(),
+  url: z.string().refine((val) => val === "" || z.string().url().safeParse(val).success, {
+    message: "Invalid URL",
+  }),
   publish_date: z.string().nullable().optional(),
   political_lean: z.enum(['left', 'center', 'right']).optional(),
   source_type: z.enum(['primary', 'secondary', 'tertiary']),
   category: z.string().optional(),
-  image_url: z.string().url().optional(),
+  image_url: z.string().optional().refine((val) => !val || val === "" || z.string().url().safeParse(val).success, {
+    message: "Invalid URL",
+  }),
 });
 
 export const CitationSchema = z.object({
