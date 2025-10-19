@@ -13,11 +13,11 @@ interface SourceTreeModalProps {
 export const SourceTreeModal = ({ open, onOpenChange, nodes, edges, claims }: SourceTreeModalProps) => {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-[90vw] max-h-[90vh] h-[90vh] p-6">
-        <DialogHeader>
+      <DialogContent className="max-w-[90vw] max-h-[90vh] h-[90vh] p-6 flex flex-col gap-0">
+        <DialogHeader className="pb-4">
           <DialogTitle>Interactive Source Tree</DialogTitle>
         </DialogHeader>
-        <div className="flex-1 h-full">
+        <div className="flex-1 overflow-hidden">
           <ReactFlowGraph nodes={nodes} edges={edges} claims={claims} isModal={true} />
         </div>
       </DialogContent>
