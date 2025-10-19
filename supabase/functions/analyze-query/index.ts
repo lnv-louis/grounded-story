@@ -214,11 +214,11 @@ ANALYSIS FRAMEWORK:
    - If the article headline is available, you MUST use it verbatim
 
 2. CLAIM EXTRACTION STRATEGY
-   - Extract AT LEAST 7 KEY claims (the most important factual assertions)
+   - Extract AT LEAST 5 KEY claims (the most important factual assertions)
    - These key claims will be displayed prominently with full details
-   - If there are more than 7 significant claims, extract them as ADDITIONAL claims
+   - If there are more than 5 significant claims, extract them as ADDITIONAL claims
    - Additional claims should still be factual and important, just less central
-   - Aim for 7-12 total claims when possible
+   - Aim for 8-12 total claims when possible
 
 3. SOURCE TRACING (Critical)
    - For EACH claim, find the original source(s)

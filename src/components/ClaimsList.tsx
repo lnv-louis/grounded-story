@@ -7,8 +7,8 @@ interface ClaimsListProps {
 }
 
 export const ClaimsList = ({ claims, sources }: ClaimsListProps) => {
-  const keyClaims = claims.slice(0, 7);
-  const additionalClaims = claims.slice(7);
+  const keyClaims = claims.slice(0, 5);
+  const additionalClaims = claims.slice(5);
 
   return (
     <div className="space-y-6">
@@ -31,7 +31,7 @@ export const ClaimsList = ({ claims, sources }: ClaimsListProps) => {
                 key={idx + 7} 
                 claim={claim} 
                 sources={sources} 
-                index={idx + 7}
+                index={idx + 5}
                 compact
               />
             ))}
