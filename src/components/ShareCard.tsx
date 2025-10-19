@@ -43,7 +43,7 @@ export const ShareCard = ({ result, onClose }: ShareCardProps) => {
   const formattedDate = format(new Date(), "MMMM do yyyy");
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 pt-32">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 pt-[100px]">
       <div className="relative max-w-2xl w-full">
         <Button
           variant="ghost"
