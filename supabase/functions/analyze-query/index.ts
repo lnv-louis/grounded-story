@@ -358,8 +358,7 @@ CRITICAL RULES:
         model: 'sonar-pro',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: prePrompt },
-          { role: 'user', content: actualContent }
+          { role: 'user', content: `${prePrompt}\n\n${actualContent}` }
         ],
         temperature: 0.2,
         top_p: 0.9,
