@@ -6,6 +6,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { ArrowLeft } from "lucide-react";
+import logo from "@/assets/grounded-logo.png";
 
 const Auth = () => {
   const navigate = useNavigate();
@@ -57,6 +58,7 @@ const Auth = () => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
+          <img src={logo} alt="Grounded" className="h-8 w-8" />
           <h1 className="text-2xl font-bold">Grounded</h1>
         </div>
 
