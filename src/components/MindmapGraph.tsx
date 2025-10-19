@@ -1,16 +1,17 @@
 import { useEffect, useRef, useState } from "react";
 import ForceGraph2D from "react-force-graph-2d";
-import { GraphNode, GraphEdge } from "@/lib/types";
+import { GraphNode, GraphEdge, Claim } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
+import { ZoomOut } from "lucide-react";
 import { Card } from "@/components/ui/card";
 
 interface MindmapGraphProps {
   nodes: GraphNode[];
   edges: GraphEdge[];
+  claims: Claim[];
 }
 
-export const MindmapGraph = ({ nodes, edges }: MindmapGraphProps) => {
+export const MindmapGraph = ({ nodes, edges, claims }: MindmapGraphProps) => {
   const graphRef = useRef<any>();
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<GraphEdge | null>(null);
@@ -31,7 +32,10 @@ export const MindmapGraph = ({ nodes, edges }: MindmapGraphProps) => {
     return '#9ca3af';
   };
 
-  const linkColor = () => 'rgba(255, 255, 255, 0.2)';
+  const linkColor = () => {
+    const isDark = !document.documentElement.classList.contains('light');
+    return isDark ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.3)';
+  };
 
   const handleNodeClick = (node: any) => {
     setSelectedNode(node);
@@ -43,10 +47,23 @@ export const MindmapGraph = ({ nodes, edges }: MindmapGraphProps) => {
     setSelectedNode(null);
   };
 
-  const handleResetZoom = () => {
+  const handleZoomOut = () => {
     if (graphRef.current) {
-      graphRef.current.zoomToFit(400);
+      graphRef.current.zoomToFit(400, 50); // 400ms animation, 50px padding
     }
+  };
+
+  const getNodeLabel = (node: GraphNode) => {
+    if (node.type === 'claim') {
+      // Extract claim index from node id (e.g., "claim-0" -> 0)
+      const claimIndex = parseInt(node.id.split('-')[1]);
+      if (claims[claimIndex]) {
+        // Truncate long claims for display
+        const claimText = claims[claimIndex].claim_text;
+        return claimText.length > 50 ? claimText.substring(0, 47) + '...' : claimText;
+      }
+    }
+    return node.name;
   };
 
   const getNodeDescription = (node: GraphNode) => {
@@ -74,17 +91,15 @@ export const MindmapGraph = ({ nodes, edges }: MindmapGraphProps) => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
-        <div className="flex gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleResetZoom}
-            className="gap-2"
-          >
-            <Maximize2 className="h-4 w-4" />
-            Reset Zoom
-          </Button>
-        </div>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={handleZoomOut}
+          className="gap-2"
+        >
+          <ZoomOut className="h-4 w-4" />
+          Zoom Out
+        </Button>
         {(selectedNode || selectedEdge) && (
           <Button
             variant="ghost"
@@ -115,7 +130,8 @@ export const MindmapGraph = ({ nodes, edges }: MindmapGraphProps) => {
             onNodeClick={handleNodeClick}
             onLinkClick={handleLinkClick}
             nodeCanvasObject={(node: any, ctx, globalScale) => {
-              const label = node.name;
+              const label = getNodeLabel(node);
+              const isDark = !document.documentElement.classList.contains('light');
               const fontSize = 12 / globalScale;
               const nodeRadius = 8;
               const isSelected = selectedNode?.id === node.id;
@@ -133,7 +149,7 @@ export const MindmapGraph = ({ nodes, edges }: MindmapGraphProps) => {
               ctx.font = `${fontSize}px Sans-Serif`;
               ctx.textAlign = 'center';
               ctx.textBaseline = 'middle';
-              ctx.fillStyle = '#ffffff';
+              ctx.fillStyle = isDark ? '#ffffff' : '#000000';
               ctx.fillText(label, node.x, node.y + nodeRadius + 10);
             }}
           />

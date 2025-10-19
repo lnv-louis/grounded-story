@@ -59,46 +59,45 @@ export const MetricsCircles = ({ metrics }: MetricsCirclesProps) => {
   ];
 
   return (
-    <div className="space-y-6">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
         {metricItems.map((item) => (
-          <Collapsible
-            key={item.id}
-            open={expandedMetric === item.id}
-            onOpenChange={(open) => setExpandedMetric(open ? item.id : null)}
-          >
-            <div className="flex flex-col items-center">
+          <div key={item.id} className="flex flex-col items-center">
+            <Collapsible
+              open={expandedMetric === item.id}
+              onOpenChange={(open) => setExpandedMetric(open ? item.id : null)}
+            >
               <CollapsibleTrigger className="group cursor-pointer">
-                <div className="relative w-28 h-28 flex items-center justify-center">
-                  <svg className="transform -rotate-90 w-28 h-28">
+                <div className="relative w-24 h-24 flex items-center justify-center">
+                  <svg className="transform -rotate-90 w-24 h-24">
                     <circle
-                      cx="56"
-                      cy="56"
-                      r="50"
+                      cx="48"
+                      cy="48"
+                      r="42"
                       stroke="currentColor"
-                      strokeWidth="8"
+                      strokeWidth="6"
                       fill="none"
                       className="text-muted opacity-20"
                     />
                     <circle
-                      cx="56"
-                      cy="56"
-                      r="50"
+                      cx="48"
+                      cy="48"
+                      r="42"
                       stroke={item.strokeColor}
-                      strokeWidth="8"
+                      strokeWidth="6"
                       fill="none"
-                      strokeDasharray={`${(item.value / 100) * 314} 314`}
+                      strokeDasharray={`${(item.value / 100) * 264} 264`}
                       className="transition-all duration-500"
                     />
                   </svg>
                   <div className="absolute inset-0 flex flex-col items-center justify-center">
-                    <span className={`text-2xl font-bold ${item.color}`}>
+                    <span className={`text-xl font-bold ${item.color}`}>
                       {item.value}%
                     </span>
                   </div>
                 </div>
                 <div className="mt-2 text-center">
-                  <p className="text-sm font-medium text-foreground">{item.label}</p>
+                  <p className="text-xs font-medium text-foreground">{item.label}</p>
                   <div className="flex items-center justify-center gap-1 text-muted-foreground mt-1">
                     {expandedMetric === item.id ? (
                       <ChevronUp className="h-3 w-3" />
@@ -108,15 +107,24 @@ export const MetricsCircles = ({ metrics }: MetricsCirclesProps) => {
                   </div>
                 </div>
               </CollapsibleTrigger>
-              <CollapsibleContent className="mt-2 w-full">
-                <Card className="p-3 bg-muted/30 border-border/50">
-                  <p className="text-xs text-muted-foreground">{item.explanation}</p>
-                </Card>
-              </CollapsibleContent>
-            </div>
-          </Collapsible>
+            </Collapsible>
+          </div>
         ))}
       </div>
+      
+      {/* Full-width explanation below all metrics */}
+      {expandedMetric && (
+        <div className="w-full animate-in fade-in slide-in-from-top-2 duration-300">
+          <Card className="p-4 bg-muted/30 border-border/50">
+            <h4 className="font-semibold text-foreground mb-2">
+              {metricItems.find(m => m.id === expandedMetric)?.label}
+            </h4>
+            <p className="text-sm text-muted-foreground">
+              {metricItems.find(m => m.id === expandedMetric)?.explanation}
+            </p>
+          </Card>
+        </div>
+      )}
     </div>
   );
 };

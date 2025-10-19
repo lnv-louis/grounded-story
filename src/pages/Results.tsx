@@ -16,6 +16,7 @@ const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const result: AnalysisResult = location.state?.result;
+  const originalQuery = location.state?.originalQuery; // Get original query if it was a URL
 
   // Scroll animations for each section
   const metricsAnimation = useScrollAnimation();
@@ -91,9 +92,20 @@ const Results = () => {
           </Button>
           <div className="flex items-center gap-3">
             <img src={logo} alt="Grounded" className="h-7 w-7" />
-            <h1 className="text-xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
-              Grounded Report
-            </h1>
+            {originalQuery && /^https?:\/\//i.test(originalQuery) ? (
+              <a
+                href={originalQuery}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent hover:opacity-80 transition-opacity"
+              >
+                Grounded Report
+              </a>
+            ) : (
+              <h1 className="text-2xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+                Grounded Report
+              </h1>
+            )}
           </div>
           <div className="flex items-center gap-2">
             <ThemeToggle />
@@ -120,7 +132,7 @@ const Results = () => {
               : 'opacity-0 translate-y-8'
           }`}
         >
-          <h3 className="text-xl font-semibold mb-6">Analysis Metrics</h3>
+          <h3 className="text-lg font-semibold mb-4">Analysis Metrics</h3>
           <MetricsCircles metrics={result.metrics} />
         </section>
 
@@ -169,7 +181,7 @@ const Results = () => {
             {/* Source Tree (Mindmap) */}
             <div className="space-y-4">
               <h3 className="text-xl font-semibold">Source Tree</h3>
-              <MindmapGraph nodes={nodes} edges={edges} />
+              <MindmapGraph nodes={nodes} edges={edges} claims={result.claims} />
             </div>
 
             {/* Sources */}

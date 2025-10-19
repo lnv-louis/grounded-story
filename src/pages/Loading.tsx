@@ -46,7 +46,13 @@ const Loading = () => {
         
         // Wait for animations to complete before navigating
         setTimeout(() => {
-          navigate('/results', { state: { result }, replace: true });
+          navigate('/results', { 
+            state: { 
+              result,
+              originalQuery: query // Pass the original query
+            }, 
+            replace: true 
+          });
         }, steps.length * stepDuration + 300);
       } catch (err: any) {
         console.error('Analysis error:', err);
