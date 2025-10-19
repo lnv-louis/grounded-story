@@ -49,34 +49,34 @@ All colors MUST be HSL.
 
   .light {
     --background: 0 0% 98%;
-    --foreground: 220 25% 10%;
+    --foreground: 0 0% 5%;
 
     --card: 0 0% 100%;
-    --card-foreground: 220 25% 10%;
+    --card-foreground: 0 0% 5%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 220 25% 10%;
+    --popover-foreground: 0 0% 5%;
 
-    --primary: 220 25% 10%;
+    --primary: 0 0% 5%;
     --primary-foreground: 0 0% 100%;
 
-    --secondary: 220 12% 90%;
-    --secondary-foreground: 220 25% 10%;
+    --secondary: 0 0% 90%;
+    --secondary-foreground: 0 0% 5%;
 
-    --muted: 220 12% 93%;
-    --muted-foreground: 220 20% 25%;
+    --muted: 0 0% 93%;
+    --muted-foreground: 0 0% 30%;
 
-    --accent: 220 12% 92%;
-    --accent-foreground: 220 25% 10%;
+    --accent: 0 0% 92%;
+    --accent-foreground: 0 0% 5%;
 
     --destructive: 0 70% 50%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 220 15% 80%;
-    --input: 220 15% 80%;
-    --ring: 220 25% 10%;
+    --border: 0 0% 80%;
+    --input: 0 0% 80%;
+    --ring: 0 0% 5%;
 
-    --shadow-glow: 0 0 40px hsl(220 20% 10% / 0.08);
+    --shadow-glow: 0 0 40px hsl(0 0% 10% / 0.08);
   }
 
   .dark {

@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AnalysisResultSchema } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
+import logoBlack from "@/assets/grounded-logo-black.png";
 import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 import { useTheme } from "next-themes";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -75,8 +76,8 @@ const Index = () => {
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm relative z-10">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <img src={logo} alt="Grounded" className="h-8 w-8" />
-            <span className="text-2xl font-bold">Grounded</span>
+            <img src={isDark ? logo : logoBlack} alt="Grounded" className="h-8 w-8" />
+            <span className="text-2xl font-bold text-foreground">Grounded</span>
           </div>
           <div className="flex gap-4 items-center">
             <ThemeToggle />
@@ -112,14 +113,14 @@ const Index = () => {
       <main className="flex-1 flex items-center justify-center px-6 relative z-10">
         <div className="w-full max-w-4xl space-y-8">
           <div className="text-center space-y-4">
-            <h1 className="text-5xl font-bold text-gradient">
+            <h1 className="text-5xl font-bold text-foreground">
               Claim-to-Source Transparency
             </h1>
           </div>
 
           <SearchBar onSearch={handleSearch} isLoading={isLoading} />
 
-          <p className="text-center text-sm text-muted-foreground/70 italic">
+          <p className="text-center text-sm text-foreground/70 italic">
             Paste article URLs or social media links for instant verification • Powered by Perplexity Sonar
           </p>
         </div>
