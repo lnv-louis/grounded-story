@@ -33,24 +33,8 @@ const Index = () => {
   };
 
   const handleSearch = async (query: string) => {
-    setIsLoading(true);
-    try {
-      const { data, error } = await supabase.functions.invoke('analyze-query', {
-        body: { query }
-      });
-
-      if (error) throw error;
-
-      // Validate response
-      const result = AnalysisResultSchema.parse(data);
-      
-      navigate('/loading', { state: { result } });
-    } catch (error: any) {
-      console.error('Analysis error:', error);
-      toast.error(error.message || 'Failed to analyze query');
-    } finally {
-      setIsLoading(false);
-    }
+    // Navigate to loading page immediately with the query
+    navigate('/loading', { state: { query } });
   };
 
   return (
