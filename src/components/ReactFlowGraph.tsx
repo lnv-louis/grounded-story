@@ -4,11 +4,11 @@ import ReactFlow, {
   Edge,
   Background,
   Controls,
-  MiniMap,
   useNodesState,
   useEdgesState,
   MarkerType,
   Position,
+  ReactFlowProvider,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { GraphNode, GraphEdge, Claim } from "@/lib/types";
@@ -218,7 +218,7 @@ export const ReactFlowGraph = ({ nodes, edges, claims }: ReactFlowGraphProps) =>
       </div>
 
       <div className="relative">
-        <div className="w-full h-[350px] bg-card/30 rounded-lg border border-border/50 overflow-hidden">
+        <div className="w-full h-[600px] bg-card/30 rounded-lg border border-border/50 overflow-hidden">
           <ReactFlow
             nodes={rfNodes}
             edges={rfEdges}
@@ -226,21 +226,15 @@ export const ReactFlowGraph = ({ nodes, edges, claims }: ReactFlowGraphProps) =>
             onEdgesChange={onEdgesChange}
             onNodeClick={onNodeClick}
             onEdgeClick={onEdgeClick}
+            nodesDraggable={false}
+            nodesConnectable={false}
+            elementsSelectable={true}
             fitView
-            attributionPosition="bottom-left"
+            proOptions={{ hideAttribution: true }}
             className={isDark ? 'dark' : 'light'}
           >
             <Background />
-            <Controls />
-            <MiniMap
-              nodeColor={(node) => {
-                const graphNode = nodes.find(n => n.id === node.id);
-                return graphNode ? nodeColor(graphNode) : '#9ca3af';
-              }}
-              style={{
-                backgroundColor: isDark ? 'rgba(0,0,0,0.5)' : 'rgba(255,255,255,0.5)',
-              }}
-            />
+            <Controls showInteractive={false} />
           </ReactFlow>
         </div>
 
