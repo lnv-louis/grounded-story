@@ -1,12 +1,5 @@
 # Grounded - Changelog
 
-## Update - 2025-10-19 (3)
-
-### Branding
-- Added network connection logo to all pages (header)
-- Logo represents claim-to-source relationship mapping
-- Consistent branding across Index, Results, Auth, and Contact pages
-
 ## Update - 2025-10-19 (2)
 
 ### Bug Fixes

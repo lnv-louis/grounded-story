@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { AnalysisResultSchema } from "@/lib/types";
 import { toast } from "sonner";
-import logo from "@/assets/grounded-logo.png";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -65,10 +64,7 @@ const Index = () => {
       {/* Header */}
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm relative z-10">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img src={logo} alt="Grounded" className="h-8 w-8" />
-            <span className="text-2xl font-bold">Grounded</span>
-          </div>
+          <div className="text-2xl font-bold">Grounded</div>
           <div className="flex gap-4">
             <Button
               variant="ghost"

@@ -8,7 +8,6 @@ import { MindmapGraph } from "@/components/MindmapGraph";
 import { MetricsDisplay } from "@/components/MetricsDisplay";
 import { AnalysisResult, GraphNode, GraphEdge } from "@/lib/types";
 import { toast } from "sonner";
-import logo from "@/assets/grounded-logo.png";
 
 const Results = () => {
   const location = useLocation();
@@ -74,10 +73,7 @@ const Results = () => {
             <ArrowLeft className="h-4 w-4" />
             New Search
           </Button>
-          <div className="flex items-center gap-2">
-            <img src={logo} alt="Grounded" className="h-6 w-6" />
-            <h1 className="text-xl font-bold">Grounded Report</h1>
-          </div>
+          <h1 className="text-xl font-bold">Grounded Report</h1>
           <Button
             variant="outline"
             size="sm"

@@ -6,7 +6,6 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
 import { toast } from "sonner";
 import { ArrowLeft, Mail } from "lucide-react";
-import logo from "@/assets/grounded-logo.png";
 
 const Contact = () => {
   const navigate = useNavigate();
@@ -40,7 +39,6 @@ const Contact = () => {
           >
             <ArrowLeft className="h-5 w-5" />
           </Button>
-          <img src={logo} alt="Grounded" className="h-8 w-8" />
           <h1 className="text-2xl font-bold">Contact Us</h1>
         </div>
 
