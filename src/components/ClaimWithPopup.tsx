@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Claim, Source } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -10,6 +10,9 @@ interface ClaimWithPopupProps {
   sources: Source[];
   index: number;
 }
+
+const POPUP_OFFSET = 10; // pixels away from cursor
+const POPUP_WIDTH = 384; // max-w-sm = 24rem = 384px
 
 const parseSourceChain = (chain: string) => {
   const parts = chain.split('→').map(s => s.trim());
@@ -45,18 +48,44 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
   };
 
   const handleMouseEnter = (e: React.MouseEvent) => {
-    setPopupPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
+    updatePopupPosition(e);
     setShowPopup(true);
   };
 
+  const updatePopupPosition = (e: React.MouseEvent) => {
+    const viewportWidth = window.innerWidth;
+    const viewportHeight = window.innerHeight;
+    
+    let x = e.clientX + POPUP_OFFSET;
+    let y = e.clientY + POPUP_OFFSET;
+    
+    // Check if popup would go off right edge
+    if (x + POPUP_WIDTH > viewportWidth) {
+      x = e.clientX - POPUP_WIDTH - POPUP_OFFSET;
+    }
+    
+    // Check if popup would go off bottom edge (estimate height ~300px)
+    if (y + 300 > viewportHeight) {
+      y = e.clientY - 300 - POPUP_OFFSET;
+    }
+    
+    // Ensure it doesn't go off left edge
+    if (x < POPUP_OFFSET) {
+      x = POPUP_OFFSET;
+    }
+    
+    // Ensure it doesn't go off top edge
+    if (y < POPUP_OFFSET) {
+      y = POPUP_OFFSET;
+    }
+    
+    setPopupPosition({ x, y });
+  };
+
   const handleMouseMove = (e: React.MouseEvent) => {
-    setPopupPosition({
-      x: e.clientX,
-      y: e.clientY,
-    });
+    if (showPopup) {
+      updatePopupPosition(e);
+    }
   };
 
   return (
@@ -127,9 +156,8 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
         <div
           className="fixed z-[100] pointer-events-none"
           style={{
-            left: `${popupPosition.x + 15}px`,
-            top: `${popupPosition.y + 15}px`,
-            transform: 'translate(0, 0)',
+            left: `${popupPosition.x}px`,
+            top: `${popupPosition.y}px`,
           }}
         >
           <Card className="p-4 bg-card/95 backdrop-blur-md border-primary/50 shadow-2xl max-w-sm animate-in fade-in zoom-in-95 duration-200 pointer-events-auto">
