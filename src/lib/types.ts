@@ -4,6 +4,7 @@ export const ClaimSchema = z.object({
   claim_text: z.string(),
   confidence: z.number().min(0).max(1),
   position: z.number(),
+  source_chain: z.string().optional(),
 });
 
 export const SourceSchema = z.object({
@@ -29,14 +30,23 @@ export const EdgeSchema = z.object({
 });
 
 export const MetricsSchema = z.object({
+  factual_accuracy: z.number().min(0).max(100),
+  clickbait_level: z.number().min(0).max(100),
+  bias_level: z.number().min(0).max(100),
   transparency_score: z.number().min(0).max(1),
   confidence_score: z.number().min(0).max(1),
   spectrum_coverage: z.string(),
+  political_distribution: z.object({
+    left: z.number(),
+    center: z.number(),
+    right: z.number(),
+  }).optional(),
 });
 
 export const AnalysisResultSchema = z.object({
   topic: z.string(),
   headline: z.string(),
+  summary: z.string().optional(),
   claims: z.array(ClaimSchema),
   sources: z.array(SourceSchema),
   citations: z.array(CitationSchema),

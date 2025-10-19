@@ -95,6 +95,12 @@ const Results = () => {
         <section>
           <h2 className="text-3xl font-bold mb-2">{result.headline}</h2>
           <p className="text-muted-foreground">{result.topic}</p>
+          {result.summary && (
+            <div className="mt-4 p-4 bg-muted/30 rounded-lg border border-border/50">
+              <p className="text-sm text-muted-foreground font-medium mb-1">AI Summary</p>
+              <p className="text-sm">{result.summary}</p>
+            </div>
+          )}
         </section>
 
         {/* Key Claims */}
