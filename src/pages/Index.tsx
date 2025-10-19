@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AnalysisResultSchema } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
+import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 
 const Index = () => {
   const navigate = useNavigate();
@@ -54,9 +55,23 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
-      {/* Animated Gradient Background */}
+      {/* Shader Gradient Background */}
       <div className="absolute inset-0 z-0">
-        <div className="absolute inset-0 animated-gradient" />
+        <ShaderGradientCanvas
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+          }}
+          pointerEvents="none"
+        >
+          <ShaderGradient
+            control='query'
+            urlString='https://www.shadergradient.co/customize?animate=on&axesHelper=off&bgColor1=%23000000&bgColor2=%23000000&brightness=0.2&cAzimuthAngle=180&cDistance=4&cPolarAngle=90&cameraZoom=1&color1=%230A0A0A&color2=%237A7A7A&color3=%2320d3a8&destination=onCanvas&embedMode=off&envPreset=city&format=gif&fov=40&frameRate=10&gizmoHelper=hide&grain=off&lightType=3d&pixelDensity=2.1&positionX=-1.4&positionY=1&positionZ=0&range=enabled&rangeEnd=40&rangeStart=0&reflection=0.1&rotationX=0&rotationY=10&rotationZ=50&shader=defaults&toggleAxis=false&type=waterPlane&uAmplitude=0&uDensity=2.1&uFrequency=5.5&uSpeed=0.1&uStrength=5.3&uTime=0&wireframe=false&zoomOut=false'
+          />
+        </ShaderGradientCanvas>
       </div>
 
       {/* Header */}
