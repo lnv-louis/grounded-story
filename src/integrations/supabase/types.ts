@@ -14,7 +14,238 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      articles: {
+        Row: {
+          created_at: string | null
+          headline: string
+          id: string
+          query: string
+          topic: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          headline: string
+          id?: string
+          query: string
+          topic?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          headline?: string
+          id?: string
+          query?: string
+          topic?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      citations: {
+        Row: {
+          claim_id: string | null
+          created_at: string | null
+          excerpt: string
+          id: string
+          page_number: string | null
+          rationale: string | null
+          source_id: string | null
+        }
+        Insert: {
+          claim_id?: string | null
+          created_at?: string | null
+          excerpt: string
+          id?: string
+          page_number?: string | null
+          rationale?: string | null
+          source_id?: string | null
+        }
+        Update: {
+          claim_id?: string | null
+          created_at?: string | null
+          excerpt?: string
+          id?: string
+          page_number?: string | null
+          rationale?: string | null
+          source_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "citations_claim_id_fkey"
+            columns: ["claim_id"]
+            isOneToOne: false
+            referencedRelation: "claims"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "citations_source_id_fkey"
+            columns: ["source_id"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      claims: {
+        Row: {
+          article_id: string | null
+          claim_text: string
+          confidence: number | null
+          created_at: string | null
+          id: string
+          position: number | null
+        }
+        Insert: {
+          article_id?: string | null
+          claim_text: string
+          confidence?: number | null
+          created_at?: string | null
+          id?: string
+          position?: number | null
+        }
+        Update: {
+          article_id?: string | null
+          claim_text?: string
+          confidence?: number | null
+          created_at?: string | null
+          id?: string
+          position?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "claims_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      graph_edges: {
+        Row: {
+          article_id: string | null
+          created_at: string | null
+          edge_type: string | null
+          id: string
+          source_node: string | null
+          target_node: string | null
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string | null
+          edge_type?: string | null
+          id?: string
+          source_node?: string | null
+          target_node?: string | null
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string | null
+          edge_type?: string | null
+          id?: string
+          source_node?: string | null
+          target_node?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "graph_edges_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "graph_edges_source_node_fkey"
+            columns: ["source_node"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "graph_edges_target_node_fkey"
+            columns: ["target_node"]
+            isOneToOne: false
+            referencedRelation: "sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      metrics: {
+        Row: {
+          article_id: string | null
+          confidence_score: number | null
+          created_at: string | null
+          id: string
+          spectrum_coverage: string | null
+          transparency_score: number | null
+        }
+        Insert: {
+          article_id?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          spectrum_coverage?: string | null
+          transparency_score?: number | null
+        }
+        Update: {
+          article_id?: string | null
+          confidence_score?: number | null
+          created_at?: string | null
+          id?: string
+          spectrum_coverage?: string | null
+          transparency_score?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "metrics_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sources: {
+        Row: {
+          article_id: string | null
+          created_at: string | null
+          id: string
+          outlet_name: string
+          political_lean: string | null
+          publish_date: string | null
+          source_type: string | null
+          url: string
+        }
+        Insert: {
+          article_id?: string | null
+          created_at?: string | null
+          id?: string
+          outlet_name: string
+          political_lean?: string | null
+          publish_date?: string | null
+          source_type?: string | null
+          url: string
+        }
+        Update: {
+          article_id?: string | null
+          created_at?: string | null
+          id?: string
+          outlet_name?: string
+          political_lean?: string | null
+          publish_date?: string | null
+          source_type?: string | null
+          url?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "sources_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
