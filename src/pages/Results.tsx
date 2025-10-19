@@ -1,11 +1,10 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Share2 } from "lucide-react";
-import { SpectrumBar } from "@/components/SpectrumBar";
 import { ClaimsList } from "@/components/ClaimsList";
 import { SourceCard } from "@/components/SourceCard";
 import { MindmapGraph } from "@/components/MindmapGraph";
-import { MetricsDisplay } from "@/components/MetricsDisplay";
+import { MetricsCircles } from "@/components/MetricsCircles";
 import { AnalysisResult, GraphNode, GraphEdge } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
@@ -24,7 +23,7 @@ const Results = () => {
     }
 
     // Animate sections appearing one by one
-    const sections = ['headline', 'claims', 'spectrum', 'sources', 'graph', 'metrics'];
+    const sections = ['metrics', 'headline', 'claims', 'sources', 'graph'];
     let index = 0;
     
     const interval = setInterval(() => {
@@ -43,7 +42,9 @@ const Results = () => {
     return null;
   }
 
-  // Build graph data
+  // Build graph data - filter out empty sources
+  const validSources = result.sources.filter(s => s.outlet_name && s.outlet_name.trim() !== '');
+  
   const nodes: GraphNode[] = [
     { id: 'article', name: result.topic, type: 'article' },
     ...result.claims.map((claim, idx) => ({
@@ -51,7 +52,7 @@ const Results = () => {
       name: `Claim ${idx + 1}`,
       type: 'claim' as const,
     })),
-    ...result.sources.map((source, idx) => ({
+    ...validSources.map((source, idx) => ({
       id: `source-${idx}`,
       name: source.outlet_name,
       type: 'source' as const,
@@ -114,6 +115,18 @@ const Results = () => {
       </header>
 
       <main className="container mx-auto px-6 py-8 space-y-8">
+        {/* Metrics - Show First */}
+        <section 
+          className={`transition-all duration-500 ${
+            visibleSections.has('metrics') 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
+          <h3 className="text-xl font-semibold mb-6">Analysis Metrics</h3>
+          <MetricsCircles metrics={result.metrics} />
+        </section>
+
         {/* Headline */}
         <section 
           className={`transition-all duration-500 ${
@@ -144,18 +157,6 @@ const Results = () => {
           <ClaimsList claims={result.claims} />
         </section>
 
-        {/* Political Spectrum */}
-        <section 
-          className={`transition-all duration-500 ${
-            visibleSections.has('spectrum') 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-4'
-          }`}
-        >
-          <h3 className="text-xl font-semibold mb-4">Political Spectrum Coverage</h3>
-          <SpectrumBar sources={result.sources} />
-        </section>
-
         {/* Source Cards */}
         <section 
           className={`transition-all duration-500 ${
@@ -165,10 +166,10 @@ const Results = () => {
           }`}
         >
           <h3 className="text-xl font-semibold mb-4">
-            Sources ({result.sources.length})
+            Sources ({validSources.length})
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {result.sources.map((source, idx) => (
+            {validSources.map((source, idx) => (
               <SourceCard
                 key={idx}
                 source={source}
@@ -194,17 +195,6 @@ const Results = () => {
         >
           <h3 className="text-xl font-semibold mb-4">Relationship Mindmap</h3>
           <MindmapGraph nodes={nodes} edges={edges} />
-        </section>
-
-        {/* Metrics */}
-        <section 
-          className={`transition-all duration-500 ${
-            visibleSections.has('metrics') 
-              ? 'opacity-100 translate-y-0' 
-              : 'opacity-0 translate-y-4'
-          }`}
-        >
-          <MetricsDisplay metrics={result.metrics} />
         </section>
       </main>
     </div>

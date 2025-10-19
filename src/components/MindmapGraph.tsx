@@ -29,7 +29,7 @@ export const MindmapGraph = ({ nodes, edges }: MindmapGraphProps) => {
   const linkColor = () => 'rgba(255, 255, 255, 0.2)';
 
   return (
-    <div className="w-full h-[500px] bg-card/30 rounded-lg border border-border/50 overflow-hidden">
+    <div className="w-full h-[350px] bg-card/30 rounded-lg border border-border/50 overflow-hidden">
       <ForceGraph2D
         ref={graphRef}
         graphData={{ nodes, links: edges }}

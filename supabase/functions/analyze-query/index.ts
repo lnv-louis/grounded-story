@@ -131,7 +131,7 @@ REQUIRED JSON OUTPUT:
       "claim_text": "string - the specific claim",
       "confidence": 0.85,
       "position": 1,
-      "source_chain": "string - how we traced this: 'Article A (secondary) → Report B (primary) from Organization C'"
+      "source_chain": "string - Format: 'Source Name (type) [url] → Source Name (type) [url]' e.g. 'The Guardian (secondary) [https://...] → YouGov report (primary) [https://...]'"
     }
   ],
   "sources": [
@@ -139,8 +139,10 @@ REQUIRED JSON OUTPUT:
       "outlet_name": "string",
       "url": "string",
       "publish_date": "2025-01-01T00:00:00Z",
-      "political_lean": "left|center|right",
-      "source_type": "primary|secondary|tertiary"
+      "political_lean": "left|center|right (optional, only for political content)",
+      "source_type": "primary|secondary|tertiary",
+      "category": "news outlet|government agency|research institution|individual|political party|etc",
+      "image_url": "string (optional - relevant image from the source page)"
     }
   ],
   "citations": [
@@ -161,10 +163,15 @@ REQUIRED JSON OUTPUT:
   ],
   "metrics": {
     "factual_accuracy": 85,
+    "factual_accuracy_explanation": "string - brief explanation of the score",
     "clickbait_level": 30,
+    "clickbait_explanation": "string - brief explanation of the score",
     "bias_level": 45,
+    "bias_explanation": "string - brief explanation of the score",
     "transparency_score": 0.90,
+    "transparency_explanation": "string - brief explanation of the score",
     "confidence_score": 0.85,
+    "confidence_explanation": "string - brief explanation of the score",
     "spectrum_coverage": "full|partial|limited|none",
     "political_distribution": {
       "left": 3,

@@ -11,8 +11,10 @@ export const SourceSchema = z.object({
   outlet_name: z.string(),
   url: z.string().url(),
   publish_date: z.string().optional(),
-  political_lean: z.enum(['left', 'center', 'right']),
+  political_lean: z.enum(['left', 'center', 'right']).optional(),
   source_type: z.enum(['primary', 'secondary', 'tertiary']),
+  category: z.string().optional(), // e.g., "news outlet", "government agency", "individual"
+  image_url: z.string().url().optional(),
 });
 
 export const CitationSchema = z.object({
@@ -31,10 +33,15 @@ export const EdgeSchema = z.object({
 
 export const MetricsSchema = z.object({
   factual_accuracy: z.number().min(0).max(100),
+  factual_accuracy_explanation: z.string().optional(),
   clickbait_level: z.number().min(0).max(100),
+  clickbait_explanation: z.string().optional(),
   bias_level: z.number().min(0).max(100),
+  bias_explanation: z.string().optional(),
   transparency_score: z.number().min(0).max(1),
+  transparency_explanation: z.string().optional(),
   confidence_score: z.number().min(0).max(1),
+  confidence_explanation: z.string().optional(),
   spectrum_coverage: z.string(),
   political_distribution: z.object({
     left: z.number(),
