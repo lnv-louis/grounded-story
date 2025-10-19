@@ -11,20 +11,16 @@ const Loading = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const query = location.state?.query;
-  const [progress, setProgress] = useState(0);
-  const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const [isApiComplete, setIsApiComplete] = useState(false);
   const [apiResult, setApiResult] = useState<any>(null);
-
-  const steps = [
-    { text: "Analyzing query...", duration: 800 },
-    { text: "Fetching sources...", duration: 1200 },
-    { text: "Extracting claims...", duration: 1000 },
-    { text: "Computing metrics...", duration: 900 },
-    { text: "Building visualizations...", duration: 700 },
-    { text: "Report ready!", duration: 500 }
-  ];
+  const [progressBars, setProgressBars] = useState({
+    analyzing: 0,
+    fetching: 0,
+    extracting: 0,
+    computing: 0,
+    building: 0,
+  });
 
   useEffect(() => {
     if (!query) {
@@ -58,34 +54,38 @@ const Loading = () => {
     analyzeQuery();
   }, [query, navigate]);
 
-  // Handle staggered step animations
+  // Animate progress bars independently
   useEffect(() => {
     if (error) return;
 
-    let stepIndex = 0;
-    let cumulativeDelay = 0;
-
-    const animateSteps = () => {
-      if (stepIndex >= steps.length) return;
-
-      const timeout = setTimeout(() => {
-        setCurrentStep(stepIndex + 1);
-        setProgress(((stepIndex + 1) / steps.length) * 100);
-        stepIndex++;
-        animateSteps();
-      }, steps[stepIndex].duration);
-
-      cumulativeDelay += steps[stepIndex].duration;
-      
-      return () => clearTimeout(timeout);
+    const animateBar = (key: keyof typeof progressBars, delay: number, duration: number) => {
+      setTimeout(() => {
+        const startTime = Date.now();
+        const interval = setInterval(() => {
+          const elapsed = Date.now() - startTime;
+          const progress = Math.min((elapsed / duration) * 100, 100);
+          
+          setProgressBars(prev => ({ ...prev, [key]: progress }));
+          
+          if (progress >= 100) {
+            clearInterval(interval);
+          }
+        }, 16); // ~60fps
+      }, delay);
     };
 
-    animateSteps();
-  }, [error, steps]);
+    // Stagger the progress bars
+    animateBar('analyzing', 0, 1000);
+    animateBar('fetching', 400, 1500);
+    animateBar('extracting', 900, 1200);
+    animateBar('computing', 1500, 1000);
+    animateBar('building', 2100, 800);
+  }, [error]);
 
   // Navigate when both API and animations are complete
   useEffect(() => {
-    if (isApiComplete && currentStep >= steps.length && apiResult) {
+    const allComplete = Object.values(progressBars).every(v => v >= 100);
+    if (isApiComplete && allComplete && apiResult) {
       setTimeout(() => {
         navigate('/results', { 
           state: { 
@@ -96,7 +96,7 @@ const Loading = () => {
         });
       }, 300);
     }
-  }, [isApiComplete, currentStep, apiResult, query, navigate, steps.length]);
+  }, [isApiComplete, progressBars, apiResult, query, navigate]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
@@ -120,36 +120,47 @@ const Loading = () => {
                 <p className="text-center text-sm text-muted-foreground">Redirecting to homepage...</p>
               </div>
             ) : (
-              <div className="w-full space-y-4">
-                <Progress value={progress} className="h-2" />
-                
-                <div className="space-y-2">
-                  {steps.map((step, idx) => (
-                    <div
-                      key={idx}
-                      className={`flex items-center gap-3 transition-all duration-500 ${
-                        idx < currentStep
-                          ? "opacity-50"
-                          : idx === currentStep - 1
-                          ? "opacity-100 scale-105"
-                          : "opacity-30"
-                      }`}
-                      style={{
-                        transitionDelay: `${idx * 50}ms`
-                      }}
-                    >
-                      <div
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
-                          idx < currentStep
-                            ? "bg-green-500"
-                            : idx === currentStep - 1
-                            ? "bg-primary animate-pulse"
-                            : "bg-muted"
-                        }`}
-                      />
-                      <span className="text-sm">{step.text}</span>
+              <div className="w-full space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">Analyzing query...</span>
+                      <span className="text-muted-foreground">{Math.round(progressBars.analyzing)}%</span>
                     </div>
-                  ))}
+                    <Progress value={progressBars.analyzing} className="h-2" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">Fetching sources...</span>
+                      <span className="text-muted-foreground">{Math.round(progressBars.fetching)}%</span>
+                    </div>
+                    <Progress value={progressBars.fetching} className="h-2" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">Extracting claims...</span>
+                      <span className="text-muted-foreground">{Math.round(progressBars.extracting)}%</span>
+                    </div>
+                    <Progress value={progressBars.extracting} className="h-2" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">Computing metrics...</span>
+                      <span className="text-muted-foreground">{Math.round(progressBars.computing)}%</span>
+                    </div>
+                    <Progress value={progressBars.computing} className="h-2" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between text-sm">
+                      <span className="text-foreground">Building visualizations...</span>
+                      <span className="text-muted-foreground">{Math.round(progressBars.building)}%</span>
+                    </div>
+                    <Progress value={progressBars.building} className="h-2" />
+                  </div>
                 </div>
               </div>
             )}
