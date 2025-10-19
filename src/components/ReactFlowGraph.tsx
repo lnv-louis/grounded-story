@@ -13,7 +13,6 @@ import ReactFlow, {
 import 'reactflow/dist/style.css';
 import { GraphNode, GraphEdge, Claim } from "@/lib/types";
 import { Button } from "@/components/ui/button";
-import { ZoomOut } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
 
@@ -21,9 +20,10 @@ interface ReactFlowGraphProps {
   nodes: GraphNode[];
   edges: GraphEdge[];
   claims: Claim[];
+  isModal?: boolean;
 }
 
-export const ReactFlowGraph = ({ nodes, edges, claims }: ReactFlowGraphProps) => {
+export const ReactFlowGraph = ({ nodes, edges, claims, isModal = false }: ReactFlowGraphProps) => {
   const [selectedNode, setSelectedNode] = useState<GraphNode | null>(null);
   const [selectedEdge, setSelectedEdge] = useState<GraphEdge | null>(null);
 
@@ -186,24 +186,9 @@ export const ReactFlowGraph = ({ nodes, edges, claims }: ReactFlowGraphProps) =>
   }, [edges]);
 
   return (
-    <div className="space-y-4">
-      <div className="flex items-center justify-between gap-4">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => {
-            // React Flow uses fitView for zoom out
-            const viewport = document.querySelector('.react-flow__viewport');
-            if (viewport) {
-              // This will be handled by the Controls component
-            }
-          }}
-          className="gap-2"
-        >
-          <ZoomOut className="h-4 w-4" />
-          Zoom Out
-        </Button>
-        {(selectedNode || selectedEdge) && (
+    <div className="space-y-4 h-full flex flex-col">
+      {(selectedNode || selectedEdge) && (
+        <div className="flex items-center justify-end">
           <Button
             variant="ghost"
             size="sm"
@@ -214,11 +199,11 @@ export const ReactFlowGraph = ({ nodes, edges, claims }: ReactFlowGraphProps) =>
           >
             Clear Selection
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
-      <div className="relative">
-        <div className="w-full h-[600px] bg-card/30 rounded-lg border border-border/50 overflow-hidden">
+      <div className={`relative flex-1 ${!isModal ? 'min-h-[600px]' : ''}`}>
+        <div className={`w-full ${isModal ? 'h-full' : 'h-[600px]'} bg-card/30 rounded-lg border border-border/50 overflow-hidden`}>
           <ReactFlow
             nodes={rfNodes}
             edges={rfEdges}

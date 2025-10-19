@@ -1,12 +1,13 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Share2, Download, AlertCircle } from "lucide-react";
+import { ArrowLeft, Share2, Download, AlertCircle, Maximize2 } from "lucide-react";
 import { ClaimsList } from "@/components/ClaimsList";
 import { SourceCard } from "@/components/SourceCard";
 import { ReactFlowGraph } from "@/components/ReactFlowGraph";
 import { MetricsCircles } from "@/components/MetricsCircles";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ShareCard } from "@/components/ShareCard";
+import { SourceTreeModal } from "@/components/SourceTreeModal";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -33,6 +34,7 @@ const Results = () => {
   const result: AnalysisResult = location.state?.result;
   const originalQuery = location.state?.originalQuery;
   const [showShareCard, setShowShareCard] = useState(false);
+  const [showSourceTreeModal, setShowSourceTreeModal] = useState(false);
   
 
   // Scroll animations for each section
@@ -116,6 +118,13 @@ const Results = () => {
   return (
     <>
       {showShareCard && <ShareCard result={result} onClose={() => setShowShareCard(false)} />}
+      <SourceTreeModal
+        open={showSourceTreeModal}
+        onOpenChange={setShowSourceTreeModal}
+        nodes={nodes}
+        edges={edges}
+        claims={result.claims}
+      />
       
       <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
         <header className="border-b border-border/50 bg-card/50 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
@@ -250,7 +259,18 @@ const Results = () => {
         >
           <div className="grid lg:grid-cols-[350px_1fr] gap-8">
             <div className="space-y-4 order-2 lg:order-1">
-              <h3 className="text-xl font-semibold">Source Tree</h3>
+              <div className="flex items-center justify-between">
+                <h3 className="text-xl font-semibold">Source Tree</h3>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowSourceTreeModal(true)}
+                  className="gap-2"
+                >
+                  <Maximize2 className="h-4 w-4" />
+                  Expand
+                </Button>
+              </div>
               <div className="lg:sticky lg:top-24">
                 <ReactFlowGraph nodes={nodes} edges={edges} claims={result.claims} />
               </div>
