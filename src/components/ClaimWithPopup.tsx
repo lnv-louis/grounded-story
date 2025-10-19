@@ -139,9 +139,12 @@ export const ClaimWithPopup = ({ claim, sources, index, compact = false }: Claim
                     <ExternalLink className="h-3 w-3 text-muted-foreground" />
                   </a>
                 ) : (
-                  <Badge variant="outline" className={getTypeColor(source.type)}>
-                    {source.name}
-                  </Badge>
+                  <div className="flex items-center gap-1">
+                    <Badge variant="outline" className={getTypeColor(source.type)}>
+                      {source.name}
+                    </Badge>
+                    <span className="text-xs text-muted-foreground italic">cited by article</span>
+                  </div>
                 )}
                 {sIdx < sourceChain.length - 1 && (
                   <span className="text-muted-foreground">→</span>
