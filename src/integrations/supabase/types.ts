@@ -246,6 +246,42 @@ export type Database = {
           },
         ]
       }
+      user_reports: {
+        Row: {
+          analysis_data: Json
+          created_at: string
+          headline: string | null
+          id: string
+          query: string
+          summary: string | null
+          topic: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          analysis_data: Json
+          created_at?: string
+          headline?: string | null
+          id?: string
+          query: string
+          summary?: string | null
+          topic?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          analysis_data?: Json
+          created_at?: string
+          headline?: string | null
+          id?: string
+          query?: string
+          summary?: string | null
+          topic?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
