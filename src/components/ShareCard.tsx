@@ -2,10 +2,11 @@ import { useRef } from "react";
 import { AnalysisResult } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Download, X } from "lucide-react";
+import { Download, X, Target, Flame, Scale, Eye } from "lucide-react";
 import { toast } from "sonner";
 import html2canvas from "html2canvas";
 import logo from "@/assets/grounded-logo.png";
+import { format } from "date-fns";
 
 interface ShareCardProps {
   result: AnalysisResult;
@@ -38,9 +39,11 @@ export const ShareCard = ({ result, onClose }: ShareCardProps) => {
 
   const validSources = result.sources.filter(s => s.url_valid !== false);
   const topClaim = result.claims[0];
+  const topSources = validSources.slice(0, 5);
+  const formattedDate = format(new Date(), "MMMM do yyyy");
 
   return (
-    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 bg-background/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 pt-24">
       <div className="relative max-w-2xl w-full">
         <Button
           variant="ghost"
@@ -61,7 +64,7 @@ export const ShareCard = ({ result, onClose }: ShareCardProps) => {
               <img src={logo} alt="Grounded" className="h-10 w-10" />
               <div>
                 <h1 className="text-2xl font-bold text-foreground">Grounded Report</h1>
-                <p className="text-sm text-muted-foreground">Claim-to-Source Transparency</p>
+                <p className="text-sm text-muted-foreground">trace the story to its source</p>
               </div>
             </div>
             <div className="text-right">
@@ -81,21 +84,39 @@ export const ShareCard = ({ result, onClose }: ShareCardProps) => {
           </div>
 
           {/* Key Metrics */}
-          <div className="grid grid-cols-3 gap-4 mb-6">
+          <div className="grid grid-cols-4 gap-3 mb-6">
             <div className="text-center p-3 bg-card/50 rounded-lg border border-border/30">
-              <div className="text-2xl font-bold text-yellow-400">
+              <div className="flex justify-center mb-1">
+                <Target className="h-5 w-5 text-primary" />
+              </div>
+              <div className="text-xl font-bold text-primary">
+                {result.metrics.factual_accuracy}%
+              </div>
+              <div className="text-xs text-muted-foreground">Accuracy</div>
+            </div>
+            <div className="text-center p-3 bg-card/50 rounded-lg border border-border/30">
+              <div className="flex justify-center mb-1">
+                <Flame className="h-5 w-5 text-yellow-400" />
+              </div>
+              <div className="text-xl font-bold text-yellow-400">
                 {result.metrics.clickbait_level}%
               </div>
               <div className="text-xs text-muted-foreground">Clickbait</div>
             </div>
             <div className="text-center p-3 bg-card/50 rounded-lg border border-border/30">
-              <div className="text-2xl font-bold text-orange-400">
+              <div className="flex justify-center mb-1">
+                <Scale className="h-5 w-5 text-orange-400" />
+              </div>
+              <div className="text-xl font-bold text-orange-400">
                 {result.metrics.bias_level}%
               </div>
               <div className="text-xs text-muted-foreground">Bias</div>
             </div>
             <div className="text-center p-3 bg-card/50 rounded-lg border border-border/30">
-              <div className="text-2xl font-bold text-blue-400">
+              <div className="flex justify-center mb-1">
+                <Eye className="h-5 w-5 text-blue-400" />
+              </div>
+              <div className="text-xl font-bold text-blue-400">
                 {Math.round(result.metrics.transparency_score * 100)}%
               </div>
               <div className="text-xs text-muted-foreground">Transparency</div>
@@ -124,13 +145,27 @@ export const ShareCard = ({ result, onClose }: ShareCardProps) => {
             </div>
           )}
 
+          {/* Key Sources */}
+          {topSources.length > 0 && (
+            <div className="mb-4 p-3 bg-card/30 rounded-lg border border-border/30">
+              <div className="text-xs text-muted-foreground mb-2">Key Sources</div>
+              <div className="flex flex-wrap gap-2">
+                {topSources.map((source, idx) => (
+                  <span key={idx} className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full border border-primary/20">
+                    {source.outlet_name}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Sources Summary */}
           <div className="flex items-center justify-between pt-4 border-t border-border/30">
             <div className="text-sm text-muted-foreground">
               Analyzed {result.claims.length} claims from {validSources.length} sources
             </div>
             <div className="text-xs text-muted-foreground">
-              Generated {new Date().toLocaleDateString()}
+              Generated {formattedDate}
             </div>
           </div>
         </Card>

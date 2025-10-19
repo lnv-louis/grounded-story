@@ -257,7 +257,7 @@ const Results = () => {
               : 'opacity-0 translate-y-8'
           }`}
         >
-          <div className="grid lg:grid-cols-[350px_1fr] gap-8">
+          <div className="grid lg:grid-cols-2 gap-8">
             <div className="space-y-4 order-2 lg:order-1">
               <div className="flex items-center justify-between">
                 <h3 className="text-xl font-semibold">Source Tree</h3>
