@@ -9,6 +9,7 @@ interface ClaimWithPopupProps {
   claim: Claim;
   sources: Source[];
   index: number;
+  compact?: boolean;
 }
 
 const POPUP_OFFSET = 10; // pixels away from cursor
@@ -29,7 +30,7 @@ const parseSourceChain = (chain: string) => {
   });
 };
 
-export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) => {
+export const ClaimWithPopup = ({ claim, sources, index, compact = false }: ClaimWithPopupProps) => {
   const [showPopup, setShowPopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
@@ -91,17 +92,17 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
   return (
     <Card 
       ref={cardRef}
-      className="p-4 bg-card/50 border-border/50 relative cursor-pointer hover:border-primary/50 transition-all"
+      className={`${compact ? 'p-3' : 'p-4'} bg-card/50 border-border/50 relative cursor-pointer hover:border-primary/50 transition-all`}
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setShowPopup(false)}
     >
       <div className="space-y-2">
         <div className="flex items-start justify-between gap-3">
-          <p className="text-foreground flex-1">{claim.claim_text}</p>
+          <p className={`text-foreground flex-1 ${compact ? 'text-sm line-clamp-2' : ''}`}>{claim.claim_text}</p>
           <Badge 
             variant="outline" 
-            className={`shrink-0 ${
+            className={`shrink-0 ${compact ? 'text-xs' : ''} ${
               claim.confidence >= 0.8 
                 ? "bg-green-500/20 text-green-400 border-green-500/30"
                 : claim.confidence >= 0.6
@@ -112,14 +113,14 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
             {Math.round(claim.confidence * 100)}%
           </Badge>
         </div>
-        {claim.confidence_explanation && (
+        {!compact && claim.confidence_explanation && (
           <p className="text-xs text-muted-foreground w-full">
             {claim.confidence_explanation}
           </p>
         )}
       </div>
       
-      {sourceChain.length > 0 && (
+      {!compact && sourceChain.length > 0 && (
         <div className="mt-3 pt-3 border-t border-border/30">
           <div className="flex flex-wrap items-center gap-2">
             {sourceChain.map((source, sIdx) => (

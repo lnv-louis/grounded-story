@@ -213,7 +213,14 @@ ANALYSIS FRAMEWORK:
    - Use the EXACT headline from the article - DO NOT create your own headline
    - If the article headline is available, you MUST use it verbatim
 
-2. SOURCE TRACING (Critical)
+2. CLAIM EXTRACTION STRATEGY
+   - Extract AT LEAST 7 KEY claims (the most important factual assertions)
+   - These key claims will be displayed prominently with full details
+   - If there are more than 7 significant claims, extract them as ADDITIONAL claims
+   - Additional claims should still be factual and important, just less central
+   - Aim for 7-12 total claims when possible
+
+3. SOURCE TRACING (Critical)
    - For EACH claim, find the original source(s)
    - Trace the information chain: "Claim → Article A → Report B → Organization C"
    - Classify sources as:
@@ -223,7 +230,7 @@ ANALYSIS FRAMEWORK:
    - Find sources across the political spectrum (left, center, right)
    - Include publish dates and URLs
 
-3. FACTUAL ACCURACY METRIC (0-100%)
+4. FACTUAL ACCURACY METRIC (0-100%)
    Calculate based on:
    - % of claims that can be traced to credible, verifiable sources
    - Quality of sources (primary > secondary > tertiary)
@@ -237,7 +244,7 @@ ANALYSIS FRAMEWORK:
    - 30-49%: Limited verification, few credible sources
    - 0-29%: Minimal or no credible sourcing
 
-4. CLICKBAIT LEVEL METRIC (0-100%)
+5. CLICKBAIT LEVEL METRIC (0-100%)
    Evaluate the headline and framing for:
    - Emotional manipulation (fear, outrage, curiosity gaps)
    - Exaggeration or hyperbole
@@ -252,7 +259,7 @@ ANALYSIS FRAMEWORK:
    - 61-80%: Highly sensational, misleading framing
    - 81-100%: Pure clickbait, deceptive headline
 
-5. BIAS LEVEL METRIC (0-100%)
+6. BIAS LEVEL METRIC (0-100%)
    Assess partisan lean and agenda-driven framing:
    - Language choice (loaded words, framing)
    - Source selection (only citing aligned sources)
@@ -267,14 +274,14 @@ ANALYSIS FRAMEWORK:
    - 61-80%: Strong bias, minimal opposing views
    - 81-100%: Extreme bias, propaganda-like
 
-6. POLITICAL SPECTRUM ANALYSIS
+7. POLITICAL SPECTRUM ANALYSIS
    ${isUrl ? 'ONLY if the content is political in nature,' : 'ONLY for political topics,'}
    provide spectrum_coverage showing distribution of sources across:
    - left: Progressive/liberal sources
    - center: Centrist/neutral sources  
    - right: Conservative sources
 
-7. CONFIDENCE RATINGS
+8. CONFIDENCE RATINGS
    For each claim, provide confidence (0-1) based on:
    - Source quality and independence
    - Corroboration across sources
