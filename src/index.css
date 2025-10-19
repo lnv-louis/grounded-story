@@ -83,6 +83,29 @@ All colors MUST be HSL.
     animation: mesh-move 20s ease-in-out infinite;
   }
 
+  .animated-gradient {
+    background: linear-gradient(
+      135deg,
+      #0a0a0a 0%,
+      #1a1a1a 20%,
+      #0a0a0a 40%,
+      #20d3a8 60%,
+      #7a7a7a 80%,
+      #0a0a0a 100%
+    );
+    background-size: 400% 400%;
+    animation: gradient-wave 15s ease-in-out infinite;
+  }
+
+  @keyframes gradient-wave {
+    0%, 100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
   @keyframes mesh-move {
     0%, 100% { transform: translate(0, 0); }
     25% { transform: translate(20px, -20px); }

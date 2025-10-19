@@ -154,7 +154,7 @@ const Results = () => {
           }`}
         >
           <h3 className="text-xl font-semibold mb-4">Key Claims</h3>
-          <ClaimsList claims={result.claims} />
+          <ClaimsList claims={result.claims} sources={validSources} />
         </section>
 
         {/* Source Cards */}

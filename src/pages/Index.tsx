@@ -54,13 +54,10 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
-      {/* Mesh gradient background */}
-      {isLoading && (
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-gradient-to-br from-white via-green-50 to-green-100 opacity-20" />
-          <div className="absolute inset-0 mesh-gradient" />
-        </div>
-      )}
+      {/* Animated Gradient Background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 animated-gradient" />
+      </div>
 
       {/* Header */}
       <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm relative z-10">
