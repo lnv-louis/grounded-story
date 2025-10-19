@@ -8,18 +8,25 @@ import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
 import logoBlack from "@/assets/grounded-logo-black.png";
 import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
-import { useTheme } from "next-themes";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
   const [user, setUser] = useState<any>(null);
-  const { theme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const [isLight, setIsLight] = useState(false);
 
   useEffect(() => {
-    setMounted(true);
+    const initial = localStorage.getItem('theme') === 'light' || document.documentElement.classList.contains('light');
+    setIsLight(initial);
+    const onThemeChange = (e: any) => setIsLight(e.detail === 'light');
+    const onStorage = (e: StorageEvent) => { if (e.key === 'theme') setIsLight(e.newValue === 'light'); };
+    window.addEventListener('theme-change', onThemeChange as EventListener);
+    window.addEventListener('storage', onStorage);
+    return () => {
+      window.removeEventListener('theme-change', onThemeChange as EventListener);
+      window.removeEventListener('storage', onStorage);
+    };
   }, []);
 
   useEffect(() => {
@@ -45,7 +52,7 @@ const Index = () => {
     navigate('/loading', { state: { query } });
   };
 
-  const isDark = theme === 'dark' || (!mounted && theme !== 'light');
+  const isDark = !isLight;
 
   return (
     <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">

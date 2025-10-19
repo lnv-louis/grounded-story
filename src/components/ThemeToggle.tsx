@@ -17,6 +17,7 @@ export const ThemeToggle = () => {
     setTheme(newTheme);
     localStorage.setItem('theme', newTheme);
     document.documentElement.classList.toggle('light', newTheme === 'light');
+    window.dispatchEvent(new CustomEvent('theme-change', { detail: newTheme }));
   };
 
   return (
