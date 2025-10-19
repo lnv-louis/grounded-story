@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { SearchBar } from "@/components/SearchBar";
 import { Button } from "@/components/ui/button";
@@ -9,6 +9,26 @@ import { toast } from "sonner";
 const Index = () => {
   const navigate = useNavigate();
   const [isLoading, setIsLoading] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    // Check current auth state
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Listen for auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    toast.success("Logged out successfully");
+  };
 
   const handleSearch = async (query: string) => {
     setIsLoading(true);
@@ -32,9 +52,17 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col relative overflow-hidden">
+      {/* Mesh gradient background */}
+      {isLoading && (
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-gradient-to-br from-white via-green-50 to-green-100 opacity-20" />
+          <div className="absolute inset-0 mesh-gradient" />
+        </div>
+      )}
+
       {/* Header */}
-      <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm">
+      <header className="border-b border-border/50 bg-card/30 backdrop-blur-sm relative z-10">
         <div className="container mx-auto px-6 py-4 flex items-center justify-between">
           <div className="text-2xl font-bold">Grounded</div>
           <div className="flex gap-4">
@@ -45,27 +73,34 @@ const Index = () => {
             >
               Contact Us
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/auth')}
-            >
-              Login
-            </Button>
+            {user ? (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleLogout}
+              >
+                Logout
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/auth')}
+              >
+                Login
+              </Button>
+            )}
           </div>
         </div>
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 flex items-center justify-center px-6">
+      <main className="flex-1 flex items-center justify-center px-6 relative z-10">
         <div className="w-full max-w-4xl space-y-8">
           <div className="text-center space-y-4">
             <h1 className="text-5xl font-bold text-gradient">
               Claim-to-Source Transparency
             </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Verify facts with multi-perspective source analysis
-            </p>
           </div>
 
           <SearchBar onSearch={handleSearch} isLoading={isLoading} />
@@ -77,7 +112,7 @@ const Index = () => {
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/50 bg-card/30">
+      <footer className="border-t border-border/50 bg-card/30 relative z-10">
         <div className="container mx-auto px-6 py-6 text-center text-sm text-muted-foreground">
           © 2025 Grounded. Built for transparency.
         </div>

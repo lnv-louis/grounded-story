@@ -71,4 +71,22 @@ All colors MUST be HSL.
   .text-gradient {
     @apply bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent;
   }
+
+  .mesh-gradient {
+    background-image: 
+      radial-gradient(at 40% 20%, rgba(34, 197, 94, 0.15) 0px, transparent 50%),
+      radial-gradient(at 80% 0%, rgba(74, 222, 128, 0.1) 0px, transparent 50%),
+      radial-gradient(at 0% 50%, rgba(134, 239, 172, 0.08) 0px, transparent 50%),
+      radial-gradient(at 80% 50%, rgba(187, 247, 208, 0.05) 0px, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(220, 252, 231, 0.03) 0px, transparent 50%);
+    filter: blur(100px);
+    animation: mesh-move 20s ease-in-out infinite;
+  }
+
+  @keyframes mesh-move {
+    0%, 100% { transform: translate(0, 0); }
+    25% { transform: translate(20px, -20px); }
+    50% { transform: translate(-20px, 20px); }
+    75% { transform: translate(20px, 20px); }
+  }
 }

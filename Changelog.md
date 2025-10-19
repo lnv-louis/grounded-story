@@ -1,5 +1,25 @@
 # Grounded - Changelog
 
+## Update - 2025-10-19 (2)
+
+### Bug Fixes
+- Fixed Perplexity API model name from 'llama-3.1-sonar-large-128k-online' to 'sonar-pro'
+- Edge function now working with correct model
+
+### Features Added
+- Implemented full authentication flow with session management
+- Added logout functionality in header
+- User state persists across page refreshes
+- Removed tagline "Verify facts with multi-perspective source analysis"
+
+### Design Updates
+- Added mesh gradient background (white to green) during loading state
+- Gradient animates with subtle movement
+- Background only shows when search is in progress
+- Lovable-style granular gradient effect
+
+---
+
 ## Initial Build - 2025-10-19
 
 ### Database Schema
