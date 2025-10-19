@@ -2,8 +2,9 @@ import { useState, useRef } from "react";
 import { Claim, Source } from "@/lib/types";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { ExternalLink } from "lucide-react";
+import { ExternalLink, ChevronDown, ChevronUp } from "lucide-react";
 import { formatDate } from "@/lib/formatters";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 
 interface ClaimWithPopupProps {
   claim: Claim;
@@ -33,6 +34,7 @@ const parseSourceChain = (chain: string) => {
 export const ClaimWithPopup = ({ claim, sources, index, compact = false }: ClaimWithPopupProps) => {
   const [showPopup, setShowPopup] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
+  const [isExpanded, setIsExpanded] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
   
   const sourceChain = claim.source_chain ? parseSourceChain(claim.source_chain) : [];
@@ -89,20 +91,99 @@ export const ClaimWithPopup = ({ claim, sources, index, compact = false }: Claim
     }
   };
 
+  if (compact) {
+    return (
+      <Collapsible open={isExpanded} onOpenChange={setIsExpanded}>
+        <Card 
+          ref={cardRef}
+          className="p-3 bg-card/50 border-border/50 relative hover:border-primary/50 transition-all"
+        >
+          <CollapsibleTrigger asChild>
+            <div className="cursor-pointer">
+              <div className="flex items-start justify-between gap-3">
+                <p className="text-sm flex-1 line-clamp-2">{claim.claim_text}</p>
+                <div className="flex items-center gap-2 shrink-0">
+                  <Badge 
+                    variant="outline" 
+                    className={`text-xs ${
+                      claim.confidence >= 0.8 
+                        ? "bg-green-500/20 text-green-400 border-green-500/30"
+                        : claim.confidence >= 0.6
+                        ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                        : "bg-red-500/20 text-red-400 border-red-500/30"
+                    }`}
+                  >
+                    {Math.round(claim.confidence * 100)}%
+                  </Badge>
+                  {isExpanded ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                </div>
+              </div>
+            </div>
+          </CollapsibleTrigger>
+          
+          <CollapsibleContent className="space-y-2 mt-3">
+            <p className="text-foreground text-sm">{claim.claim_text}</p>
+            
+            {claim.confidence_explanation && (
+              <p className="text-xs text-muted-foreground">
+                {claim.confidence_explanation}
+              </p>
+            )}
+            
+            {sourceChain.length > 0 && (
+              <div className="pt-3 border-t border-border/30">
+                <div className="flex flex-wrap items-center gap-2">
+                  {sourceChain.map((source, sIdx) => (
+                    <div key={sIdx} className="flex items-center gap-2">
+                      {source.url ? (
+                        <a
+                          href={source.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 hover:opacity-80 transition-opacity"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <Badge variant="outline" className={getTypeColor(source.type)}>
+                            {source.name}
+                          </Badge>
+                          <ExternalLink className="h-3 w-3 text-muted-foreground" />
+                        </a>
+                      ) : (
+                        <div className="flex items-center gap-1">
+                          <Badge variant="outline" className={getTypeColor(source.type)}>
+                            {source.name}
+                          </Badge>
+                          <span className="text-xs text-muted-foreground italic">cited by article</span>
+                        </div>
+                      )}
+                      {sIdx < sourceChain.length - 1 && (
+                        <span className="text-muted-foreground">→</span>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+          </CollapsibleContent>
+        </Card>
+      </Collapsible>
+    );
+  }
+
   return (
     <Card 
       ref={cardRef}
-      className={`${compact ? 'p-3' : 'p-4'} bg-card/50 border-border/50 relative cursor-pointer hover:border-primary/50 transition-all`}
+      className="p-4 bg-card/50 border-border/50 relative cursor-pointer hover:border-primary/50 transition-all"
       onMouseEnter={handleMouseEnter}
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setShowPopup(false)}
     >
       <div className="space-y-2">
         <div className="flex items-start justify-between gap-3">
-          <p className={`text-foreground flex-1 ${compact ? 'text-sm line-clamp-2' : ''}`}>{claim.claim_text}</p>
+          <p className="text-foreground flex-1">{claim.claim_text}</p>
           <Badge 
             variant="outline" 
-            className={`shrink-0 ${compact ? 'text-xs' : ''} ${
+            className={`shrink-0 ${
               claim.confidence >= 0.8 
                 ? "bg-green-500/20 text-green-400 border-green-500/30"
                 : claim.confidence >= 0.6
@@ -113,14 +194,14 @@ export const ClaimWithPopup = ({ claim, sources, index, compact = false }: Claim
             {Math.round(claim.confidence * 100)}%
           </Badge>
         </div>
-        {!compact && claim.confidence_explanation && (
+        {claim.confidence_explanation && (
           <p className="text-xs text-muted-foreground w-full">
             {claim.confidence_explanation}
           </p>
         )}
       </div>
       
-      {!compact && sourceChain.length > 0 && (
+      {sourceChain.length > 0 && (
         <div className="mt-3 pt-3 border-t border-border/30">
           <div className="flex flex-wrap items-center gap-2">
             {sourceChain.map((source, sIdx) => (
