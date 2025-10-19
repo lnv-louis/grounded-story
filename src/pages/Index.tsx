@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
 import { ShaderGradientCanvas, ShaderGradient } from '@shadergradient/react';
 import { useTheme } from "next-themes";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -78,6 +79,7 @@ const Index = () => {
             <span className="text-2xl font-bold">Grounded</span>
           </div>
           <div className="flex gap-4 items-center">
+            <ThemeToggle />
             <Button
               variant="ghost"
               size="sm"

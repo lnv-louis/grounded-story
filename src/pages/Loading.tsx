@@ -14,14 +14,16 @@ const Loading = () => {
   const [progress, setProgress] = useState(0);
   const [currentStep, setCurrentStep] = useState(0);
   const [error, setError] = useState<string | null>(null);
+  const [isApiComplete, setIsApiComplete] = useState(false);
+  const [apiResult, setApiResult] = useState<any>(null);
 
   const steps = [
-    "Analyzing query...",
-    "Fetching sources...",
-    "Extracting claims...",
-    "Computing metrics...",
-    "Building visualizations...",
-    "Report ready!"
+    { text: "Analyzing query...", duration: 800 },
+    { text: "Fetching sources...", duration: 1200 },
+    { text: "Extracting claims...", duration: 1000 },
+    { text: "Computing metrics...", duration: 900 },
+    { text: "Building visualizations...", duration: 700 },
+    { text: "Report ready!", duration: 500 }
   ];
 
   useEffect(() => {
@@ -29,8 +31,6 @@ const Loading = () => {
       navigate("/");
       return;
     }
-
-    const stepDuration = 400; // ms per step
 
     // Start the API call immediately
     const analyzeQuery = async () => {
@@ -43,17 +43,8 @@ const Loading = () => {
 
         // Validate response
         const result = AnalysisResultSchema.parse(data);
-        
-        // Wait for animations to complete before navigating
-        setTimeout(() => {
-          navigate('/results', { 
-            state: { 
-              result,
-              originalQuery: query // Pass the original query
-            }, 
-            replace: true 
-          });
-        }, steps.length * stepDuration + 300);
+        setApiResult(result);
+        setIsApiComplete(true);
       } catch (err: any) {
         console.error('Analysis error:', err);
         setError(err.message || 'Failed to analyze query');
@@ -65,22 +56,47 @@ const Loading = () => {
     };
 
     analyzeQuery();
+  }, [query, navigate]);
 
-    // Animate progress steps
+  // Handle staggered step animations
+  useEffect(() => {
+    if (error) return;
+
     let stepIndex = 0;
-    
-    const interval = setInterval(() => {
-      stepIndex++;
-      setCurrentStep(stepIndex);
-      setProgress((stepIndex / steps.length) * 100);
+    let cumulativeDelay = 0;
 
-      if (stepIndex >= steps.length) {
-        clearInterval(interval);
-      }
-    }, stepDuration);
+    const animateSteps = () => {
+      if (stepIndex >= steps.length) return;
 
-    return () => clearInterval(interval);
-  }, [query, navigate, steps.length]);
+      const timeout = setTimeout(() => {
+        setCurrentStep(stepIndex + 1);
+        setProgress(((stepIndex + 1) / steps.length) * 100);
+        stepIndex++;
+        animateSteps();
+      }, steps[stepIndex].duration);
+
+      cumulativeDelay += steps[stepIndex].duration;
+      
+      return () => clearTimeout(timeout);
+    };
+
+    animateSteps();
+  }, [error, steps]);
+
+  // Navigate when both API and animations are complete
+  useEffect(() => {
+    if (isApiComplete && currentStep >= steps.length && apiResult) {
+      setTimeout(() => {
+        navigate('/results', { 
+          state: { 
+            result: apiResult,
+            originalQuery: query
+          }, 
+          replace: true 
+        });
+      }, 300);
+    }
+  }, [isApiComplete, currentStep, apiResult, query, navigate, steps.length]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
@@ -111,24 +127,27 @@ const Loading = () => {
                   {steps.map((step, idx) => (
                     <div
                       key={idx}
-                      className={`flex items-center gap-3 transition-all duration-300 ${
+                      className={`flex items-center gap-3 transition-all duration-500 ${
                         idx < currentStep
                           ? "opacity-50"
-                          : idx === currentStep
+                          : idx === currentStep - 1
                           ? "opacity-100 scale-105"
                           : "opacity-30"
                       }`}
+                      style={{
+                        transitionDelay: `${idx * 50}ms`
+                      }}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full transition-colors ${
+                        className={`w-2 h-2 rounded-full transition-all duration-300 ${
                           idx < currentStep
                             ? "bg-green-500"
-                            : idx === currentStep
+                            : idx === currentStep - 1
                             ? "bg-primary animate-pulse"
                             : "bg-muted"
                         }`}
                       />
-                      <span className="text-sm">{step}</span>
+                      <span className="text-sm">{step.text}</span>
                     </div>
                   ))}
                 </div>
