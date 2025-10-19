@@ -49,10 +49,16 @@ Trace every claim back to its original sources, evaluate credibility, detect bia
 
 ANALYSIS FRAMEWORK:
 
+
 1. CONTENT EXTRACTION & CLAIM IDENTIFICATION
-   - Extract all factual claims from the content
+   - CRITICAL: Extract claims ONLY about the article's main subject matter and content
+   - DO NOT extract claims about the news sources themselves (e.g., "BBC is trustworthy")
+   - DO NOT extract claims about fact-checking processes
+   - ONLY extract claims that are factual assertions made IN the article content
+   - Example: For an article about HIV drugs, claims should be about HIV drugs, NOT about BBC News
    - Identify the main topic and narrative framing
-   - Note the headline/title for clickbait analysis
+   - Use the EXACT headline from the article - DO NOT create your own headline
+   - If the article headline is available, you MUST use it verbatim
 
 2. SOURCE TRACING (Critical)
    - For EACH claim, find the original source(s)
@@ -124,12 +130,13 @@ ANALYSIS FRAMEWORK:
 REQUIRED JSON OUTPUT:
 {
   "topic": "string - main subject",
-  "headline": "string - article headline or generated headline",
+  "headline": "string - MUST be the exact article headline if URL provided, otherwise create descriptive headline about the topic",
   "summary": "string - AI-written 2-3 sentence summary of sourcing quality and key findings",
   "claims": [
     {
-      "claim_text": "string - the specific claim",
+      "claim_text": "string - ONLY factual claims from the article content itself, NOT about the sources or outlets",
       "confidence": 0.85,
+      "confidence_explanation": "string - brief 1-2 sentence explanation of why this confidence level",
       "position": 1,
       "source_chain": "string - Format: 'Source Name (type) [url] → Source Name (type) [url]' e.g. 'The Guardian (secondary) [https://...] → YouGov report (primary) [https://...]'"
     }

@@ -75,18 +75,25 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <p className="text-foreground flex-1">{claim.claim_text}</p>
-        <Badge 
-          variant="outline" 
-          className={
-            claim.confidence >= 0.8 
-              ? "bg-green-500/20 text-green-400 border-green-500/30"
-              : claim.confidence >= 0.6
-              ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
-              : "bg-red-500/20 text-red-400 border-red-500/30"
-          }
-        >
-          {Math.round(claim.confidence * 100)}%
-        </Badge>
+        <div className="flex flex-col items-end gap-1">
+          <Badge 
+            variant="outline" 
+            className={
+              claim.confidence >= 0.8 
+                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                : claim.confidence >= 0.6
+                ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                : "bg-red-500/20 text-red-400 border-red-500/30"
+            }
+          >
+            {Math.round(claim.confidence * 100)}%
+          </Badge>
+          {claim.confidence_explanation && (
+            <p className="text-xs text-muted-foreground text-right max-w-xs">
+              {claim.confidence_explanation}
+            </p>
+          )}
+        </div>
       </div>
       
       {sourceChain.length > 0 && (
@@ -196,11 +203,13 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
                 })}
               </div>
 
-              <div className="pt-2 border-t border-border/30">
-                <p className="text-xs text-muted-foreground italic">
-                  Hover to see source chain - Click badges to visit sources
-                </p>
-              </div>
+              {claim.confidence_explanation && (
+                <div className="pt-2 border-t border-border/30">
+                  <p className="text-xs text-muted-foreground">
+                    {claim.confidence_explanation}
+                  </p>
+                </div>
+              )}
             </div>
           </Card>
         </div>

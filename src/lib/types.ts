@@ -3,6 +3,7 @@ import { z } from "zod";
 export const ClaimSchema = z.object({
   claim_text: z.string(),
   confidence: z.number().min(0).max(1),
+  confidence_explanation: z.string().optional(),
   position: z.number(),
   source_chain: z.string().optional(),
 });
