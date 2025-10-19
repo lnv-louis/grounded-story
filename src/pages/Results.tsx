@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { ArrowLeft, Share2 } from "lucide-react";
 import { ClaimsList } from "@/components/ClaimsList";
 import { SourceCard } from "@/components/SourceCard";
-import { MindmapGraph } from "@/components/MindmapGraph";
+import { ReactFlowGraph } from "@/components/ReactFlowGraph";
 import { MetricsCircles } from "@/components/MetricsCircles";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
@@ -182,7 +182,7 @@ const Results = () => {
           <div className="grid lg:grid-cols-2 gap-8">
             <div className="space-y-4">
               <h3 className="text-xl font-semibold">Source Tree</h3>
-              <MindmapGraph nodes={nodes} edges={edges} claims={result.claims} />
+              <ReactFlowGraph nodes={nodes} edges={edges} claims={result.claims} />
             </div>
 
             {/* Sources */}
