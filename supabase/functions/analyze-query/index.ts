@@ -1,9 +1,87 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { DOMParser } from "https://deno.land/x/deno_dom@v0.1.38/deno-dom-wasm.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Function to fetch and extract article content
+async function fetchArticleContent(url: string): Promise<{ headline: string; content: string } | null> {
+  try {
+    console.log('Fetching article from:', url);
+    const response = await fetch(url, {
+      headers: {
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
+      }
+    });
+    
+    if (!response.ok) {
+      console.error('Failed to fetch article:', response.status);
+      return null;
+    }
+
+    const html = await response.text();
+    const doc = new DOMParser().parseFromString(html, 'text/html');
+    if (!doc) return null;
+
+    // Try to extract headline
+    let headline = '';
+    const h1 = doc.querySelector('h1');
+    const ogTitle = doc.querySelector('meta[property="og:title"]');
+    const title = doc.querySelector('title');
+    
+    headline = h1?.textContent?.trim() || 
+               ogTitle?.getAttribute('content') || 
+               title?.textContent?.trim() || 
+               '';
+
+    // Try to extract main content
+    let content = '';
+    
+    // Common article content selectors
+    const articleSelectors = [
+      'article',
+      '[role="main"]',
+      '.article-body',
+      '.post-content',
+      '.entry-content',
+      'main'
+    ];
+
+    for (const selector of articleSelectors) {
+      const element = doc.querySelector(selector);
+      if (element) {
+        // Remove scripts, styles, nav, header, footer
+        const unwanted = element.querySelectorAll('script, style, nav, header, footer, .ad, .advertisement');
+        unwanted.forEach(el => {
+          const parent = el.parentNode;
+          if (parent) {
+            parent.removeChild(el);
+          }
+        });
+        
+        content = element.textContent?.trim() || '';
+        if (content.length > 200) break;
+      }
+    }
+
+    // Fallback: get all paragraphs
+    if (!content || content.length < 200) {
+      const paragraphs = Array.from(doc.querySelectorAll('p'))
+        .map(p => p.textContent?.trim() || '')
+        .filter(text => text.length > 50);
+      content = paragraphs.join('\n\n');
+    }
+
+    console.log(`Extracted - Headline: "${headline.substring(0, 100)}", Content length: ${content.length} chars`);
+    
+    return content.length > 100 ? { headline, content } : null;
+  } catch (error) {
+    console.error('Error fetching article:', error);
+    return null;
+  }
+}
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -27,13 +105,31 @@ serve(async (req) => {
     // Detect if input is a URL
     const isUrl = /^https?:\/\//i.test(query.trim());
     
+    let articleData: { headline: string; content: string } | null = null;
+    let actualContent = query;
+    
+    // If it's a URL, fetch and extract the article content
+    if (isUrl) {
+      articleData = await fetchArticleContent(query);
+      if (articleData && articleData.content) {
+        actualContent = `Article URL: ${query}\n\nHeadline: ${articleData.headline}\n\nArticle Content:\n${articleData.content}`;
+        console.log('Successfully extracted article content');
+      } else {
+        console.warn('Failed to extract article content, falling back to URL-only analysis');
+        actualContent = query;
+      }
+    }
+    
     // Pre-prompt to generate analysis criteria
     const prePrompt = `INPUT TYPE DETECTION:
 ${isUrl ? 
 `The user has provided a URL: ${query}
-1. If it's a standard web page: Fetch and read the full article content, including headline, author, publication date, and body text.
-2. If it's a social media post (Instagram, Twitter, etc.): Extract the image(s), caption/description, author information, and engagement metrics.
-3. Use the actual content from the URL as the subject of analysis.` 
+${articleData ? 
+  `I have successfully fetched and extracted the full article content including the headline and body text.
+  CRITICAL: You MUST use the EXACT headline provided below. DO NOT create your own headline.
+  CRITICAL: Analyze ONLY the claims made IN the article content itself, NOT claims about the news sources.` 
+  : 
+  `I was unable to fetch the article content directly. Please use your web search capabilities to find and analyze the article.`}` 
 : 
 `The user has provided text/topic: ${query}
 Analyze this topic by searching for the most relevant recent articles and sources.`}
@@ -205,7 +301,8 @@ CRITICAL RULES:
         model: 'sonar-pro',
         messages: [
           { role: 'system', content: systemPrompt },
-          { role: 'user', content: `${prePrompt}\n\nINPUT: ${query}` }
+          { role: 'user', content: prePrompt },
+          { role: 'user', content: actualContent }
         ],
         temperature: 0.2,
         top_p: 0.9,
