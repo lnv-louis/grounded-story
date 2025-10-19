@@ -47,9 +47,11 @@ export const SearchBar = ({ onSearch, isLoading }: SearchBarProps) => {
     }
   };
 
+  const textareaHeight = query.split('\n').length > 2 || query.length > 100;
+
   return (
     <form onSubmit={handleSubmit} className="w-full max-w-3xl mx-auto">
-      <div className="flex gap-3 items-start">
+      <div className={`flex gap-3 ${textareaHeight ? 'flex-col items-stretch' : 'flex-row items-start'}`}>
         <div className="relative flex-1">
           <Search className="absolute left-4 top-4 h-5 w-5 text-muted-foreground z-10" />
           <Textarea
@@ -65,7 +67,7 @@ export const SearchBar = ({ onSearch, isLoading }: SearchBarProps) => {
           type="submit"
           disabled={isLoading || !query.trim()}
           size="lg"
-          className="h-[60px] px-6 shrink-0"
+          className={`px-6 shrink-0 ${textareaHeight ? 'w-full h-[50px]' : 'h-[60px]'}`}
         >
           <Search className="h-5 w-5 mr-2" />
           {isLoading ? "Analyzing..." : "Analyze"}

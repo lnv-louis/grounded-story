@@ -105,11 +105,9 @@ const Index = () => {
 
           <SearchBar onSearch={handleSearch} isLoading={isLoading} />
 
-          <div className="text-center text-sm text-muted-foreground">
-            Powered by Perplexity Sonar • Multi-perspective analysis • Political spectrum visualization
-            <br />
-            <span className="text-primary">Paste article URLs or social media links for instant verification</span>
-          </div>
+          <p className="text-center text-sm text-muted-foreground/70 italic">
+            Paste article URLs or social media links for instant verification • Powered by Perplexity Sonar
+          </p>
         </div>
       </main>
 
