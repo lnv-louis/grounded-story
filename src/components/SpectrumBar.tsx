@@ -23,20 +23,29 @@ export const SpectrumBar = ({ sources }: SpectrumBarProps) => {
       </div>
       <div className="h-8 w-full flex rounded-lg overflow-hidden border border-border">
         <div
-          className="bg-gradient-to-r from-red-500 to-red-600 flex items-center justify-center text-xs font-medium text-white"
-          style={{ width: `${leftPercent}%` }}
+          className="flex items-center justify-center text-xs font-medium text-white transition-all hover:brightness-110"
+          style={{ 
+            width: `${leftPercent}%`,
+            background: `linear-gradient(135deg, hsl(var(--spectrum-left)), hsl(var(--spectrum-left) / 0.8))`
+          }}
         >
           {leftPercent > 15 && `${Math.round(leftPercent)}%`}
         </div>
         <div
-          className="bg-gradient-to-r from-gray-500 to-gray-600 flex items-center justify-center text-xs font-medium text-white"
-          style={{ width: `${centerPercent}%` }}
+          className="flex items-center justify-center text-xs font-medium text-white transition-all hover:brightness-110"
+          style={{ 
+            width: `${centerPercent}%`,
+            background: `linear-gradient(135deg, hsl(var(--spectrum-center)), hsl(var(--spectrum-center) / 0.8))`
+          }}
         >
           {centerPercent > 15 && `${Math.round(centerPercent)}%`}
         </div>
         <div
-          className="bg-gradient-to-r from-blue-500 to-blue-600 flex items-center justify-center text-xs font-medium text-white"
-          style={{ width: `${rightPercent}%` }}
+          className="flex items-center justify-center text-xs font-medium text-white transition-all hover:brightness-110"
+          style={{ 
+            width: `${rightPercent}%`,
+            background: `linear-gradient(135deg, hsl(var(--spectrum-right)), hsl(var(--spectrum-right) / 0.8))`
+          }}
         >
           {rightPercent > 15 && `${Math.round(rightPercent)}%`}
         </div>

@@ -38,9 +38,9 @@ All colors MUST be HSL.
 
     --radius: 0.5rem;
 
-    --spectrum-left: 0 70% 50%;
+    --spectrum-left: 0 55% 55%;
     --spectrum-center: 220 10% 50%;
-    --spectrum-right: 220 70% 50%;
+    --spectrum-right: 220 60% 60%;
 
     --gradient-subtle: linear-gradient(180deg, hsl(220 20% 4%), hsl(220 18% 6%));
     --shadow-glow: 0 0 40px hsl(0 0% 100% / 0.05);

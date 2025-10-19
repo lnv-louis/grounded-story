@@ -43,7 +43,7 @@ const Index = () => {
       // Validate response
       const result = AnalysisResultSchema.parse(data);
       
-      navigate('/results', { state: { result } });
+      navigate('/loading', { state: { result } });
     } catch (error: any) {
       console.error('Analysis error:', error);
       toast.error(error.message || 'Failed to analyze query');

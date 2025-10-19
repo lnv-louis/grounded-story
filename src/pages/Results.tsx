@@ -9,14 +9,37 @@ import { MetricsDisplay } from "@/components/MetricsDisplay";
 import { AnalysisResult, GraphNode, GraphEdge } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
+import { useState, useEffect } from "react";
 
 const Results = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const result: AnalysisResult = location.state?.result;
+  const [visibleSections, setVisibleSections] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    if (!result) {
+      navigate("/");
+      return;
+    }
+
+    // Animate sections appearing one by one
+    const sections = ['headline', 'claims', 'spectrum', 'sources', 'graph', 'metrics'];
+    let index = 0;
+    
+    const interval = setInterval(() => {
+      if (index < sections.length) {
+        setVisibleSections(prev => new Set([...prev, sections[index]]));
+        index++;
+      } else {
+        clearInterval(interval);
+      }
+    }, 150);
+
+    return () => clearInterval(interval);
+  }, [result, navigate]);
 
   if (!result) {
-    navigate("/");
     return null;
   }
 
@@ -92,7 +115,13 @@ const Results = () => {
 
       <main className="container mx-auto px-6 py-8 space-y-8">
         {/* Headline */}
-        <section>
+        <section 
+          className={`transition-all duration-500 ${
+            visibleSections.has('headline') 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
           <h2 className="text-3xl font-bold mb-2">{result.headline}</h2>
           <p className="text-muted-foreground">{result.topic}</p>
           {result.summary && (
@@ -104,68 +133,77 @@ const Results = () => {
         </section>
 
         {/* Key Claims */}
-        <section>
+        <section 
+          className={`transition-all duration-500 ${
+            visibleSections.has('claims') 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
           <h3 className="text-xl font-semibold mb-4">Key Claims</h3>
           <ClaimsList claims={result.claims} />
         </section>
 
         {/* Political Spectrum */}
-        <section>
+        <section 
+          className={`transition-all duration-500 ${
+            visibleSections.has('spectrum') 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
           <h3 className="text-xl font-semibold mb-4">Political Spectrum Coverage</h3>
           <SpectrumBar sources={result.sources} />
         </section>
 
         {/* Source Cards */}
-        <section>
+        <section 
+          className={`transition-all duration-500 ${
+            visibleSections.has('sources') 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
           <h3 className="text-xl font-semibold mb-4">
             Sources ({result.sources.length})
           </h3>
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {result.sources.map((source, idx) => {
-              const sourceCitations = result.citations
-                .filter(c => c.source_index === idx)
-                .map(c => ({
-                  excerpt: c.excerpt,
-                  rationale: c.rationale,
-                  page_number: c.page_number,
-                }));
-              return (
-                <SourceCard
-                  key={idx}
-                  source={source}
-                  citations={sourceCitations}
-                />
-              );
-            })}
+            {result.sources.map((source, idx) => (
+              <SourceCard
+                key={idx}
+                source={source}
+                citations={result.citations
+                  .filter(c => c.source_index === idx)
+                  .map(c => ({
+                    excerpt: c.excerpt,
+                    rationale: c.rationale,
+                    page_number: c.page_number,
+                  }))}
+              />
+            ))}
           </div>
         </section>
 
         {/* Mindmap Graph */}
-        <section>
+        <section 
+          className={`transition-all duration-500 ${
+            visibleSections.has('graph') 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
           <h3 className="text-xl font-semibold mb-4">Relationship Mindmap</h3>
           <MindmapGraph nodes={nodes} edges={edges} />
-          <div className="mt-4 flex gap-6 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-green-500" />
-              <span>Cites</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-yellow-500" />
-              <span>Derives From</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-purple-500" />
-              <span>Republishes</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <div className="w-3 h-3 rounded-full bg-red-500" />
-              <span>Contradicts</span>
-            </div>
-          </div>
         </section>
 
         {/* Metrics */}
-        <section>
+        <section 
+          className={`transition-all duration-500 ${
+            visibleSections.has('metrics') 
+              ? 'opacity-100 translate-y-0' 
+              : 'opacity-0 translate-y-4'
+          }`}
+        >
           <MetricsDisplay metrics={result.metrics} />
         </section>
       </main>
