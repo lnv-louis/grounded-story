@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Share2, Download, AlertCircle, Maximize2 } from "lucide-react";
+import { ArrowLeft, Share2, Download, AlertCircle, Maximize2, User } from "lucide-react";
 import { ClaimsList } from "@/components/ClaimsList";
 import { SourceCard } from "@/components/SourceCard";
 import { ReactFlowGraph } from "@/components/ReactFlowGraph";
@@ -8,6 +8,7 @@ import { MetricsCircles } from "@/components/MetricsCircles";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { ShareCard } from "@/components/ShareCard";
 import { SourceTreeModal } from "@/components/SourceTreeModal";
+import { supabase } from "@/integrations/supabase/client";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -35,6 +36,13 @@ const Results = () => {
   const originalQuery = location.state?.originalQuery;
   const [showShareCard, setShowShareCard] = useState(false);
   const [showSourceTreeModal, setShowSourceTreeModal] = useState(false);
+  const [user, setUser] = useState<any>(null);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+  }, []);
   
 
   // Scroll animations for each section
@@ -158,6 +166,17 @@ const Results = () => {
               </div>
               <div className="flex items-center gap-2">
                 <ThemeToggle />
+                {user && (
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => navigate("/profile")}
+                    className="gap-2 hover:bg-primary/10 hover:border-primary/50"
+                  >
+                    <User className="h-4 w-4" />
+                    My Reports
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   size="sm"
