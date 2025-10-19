@@ -96,27 +96,27 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
       onMouseMove={handleMouseMove}
       onMouseLeave={() => setShowPopup(false)}
     >
-      <div className="flex items-start justify-between gap-3 mb-2">
-        <p className="text-foreground flex-1">{claim.claim_text}</p>
-        <div className="flex flex-col items-end gap-1">
+      <div className="space-y-2">
+        <div className="flex items-start justify-between gap-3">
+          <p className="text-foreground flex-1">{claim.claim_text}</p>
           <Badge 
             variant="outline" 
-            className={
+            className={`shrink-0 ${
               claim.confidence >= 0.8 
                 ? "bg-green-500/20 text-green-400 border-green-500/30"
                 : claim.confidence >= 0.6
                 ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
                 : "bg-red-500/20 text-red-400 border-red-500/30"
-            }
+            }`}
           >
             {Math.round(claim.confidence * 100)}%
           </Badge>
-          {claim.confidence_explanation && (
-            <p className="text-xs text-muted-foreground text-right max-w-xs">
-              {claim.confidence_explanation}
-            </p>
-          )}
         </div>
+        {claim.confidence_explanation && (
+          <p className="text-xs text-muted-foreground w-full">
+            {claim.confidence_explanation}
+          </p>
+        )}
       </div>
       
       {sourceChain.length > 0 && (
@@ -154,7 +154,7 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
       {/* Hover Popup */}
       {showPopup && sourceChain.length > 0 && (
         <div
-          className="fixed z-[100] pointer-events-none"
+          className="fixed z-[9999] pointer-events-none"
           style={{
             left: `${popupPosition.x}px`,
             top: `${popupPosition.y}px`,

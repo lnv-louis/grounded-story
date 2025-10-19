@@ -69,8 +69,8 @@ export const MetricsCircles = ({ metrics }: MetricsCirclesProps) => {
   ];
 
   return (
-    <div className="space-y-4">
-      <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+    <div className="space-y-6">
+      <div className="grid grid-cols-2 md:grid-cols-5 gap-6">
         {metricItems.map((item) => {
           const Icon = item.icon;
           return (
