@@ -39,6 +39,14 @@ const Loading = () => {
     // Check cache first
     const cached = getCachedReport(query);
     if (cached) {
+      // Instantly set all progress bars to complete for cached results
+      setProgressBars({
+        analyzing: 100,
+        fetching: 100,
+        extracting: 100,
+        computing: 100,
+        building: 100,
+      });
       setApiResult(cached);
       setIsApiComplete(true);
       toast.success("Loaded from cache");

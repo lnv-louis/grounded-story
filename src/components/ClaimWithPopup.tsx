@@ -45,24 +45,18 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
   };
 
   const handleMouseEnter = (e: React.MouseEvent) => {
-    if (cardRef.current) {
-      const rect = cardRef.current.getBoundingClientRect();
-      setPopupPosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-      setShowPopup(true);
-    }
+    setPopupPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
+    setShowPopup(true);
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (cardRef.current) {
-      const rect = cardRef.current.getBoundingClientRect();
-      setPopupPosition({
-        x: e.clientX - rect.left,
-        y: e.clientY - rect.top,
-      });
-    }
+    setPopupPosition({
+      x: e.clientX,
+      y: e.clientY,
+    });
   };
 
   return (
@@ -133,8 +127,9 @@ export const ClaimWithPopup = ({ claim, sources, index }: ClaimWithPopupProps) =
         <div
           className="fixed z-[100] pointer-events-none"
           style={{
-            left: `${popupPosition.x + 20}px`,
-            top: `${popupPosition.y + 20}px`,
+            left: `${popupPosition.x + 15}px`,
+            top: `${popupPosition.y + 15}px`,
+            transform: 'translate(0, 0)',
           }}
         >
           <Card className="p-4 bg-card/95 backdrop-blur-md border-primary/50 shadow-2xl max-w-sm animate-in fade-in zoom-in-95 duration-200 pointer-events-auto">
