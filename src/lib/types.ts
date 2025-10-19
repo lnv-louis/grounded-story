@@ -15,7 +15,7 @@ export const SourceSchema = z.object({
   }),
   url_valid: z.boolean().optional(),
   publish_date: z.string().nullable().optional(),
-  political_lean: z.enum(['left', 'center', 'right']).optional(),
+  political_lean: z.enum(['left', 'center', 'right']).or(z.literal('')).optional(),
   source_type: z.enum(['primary', 'secondary', 'tertiary']),
   category: z.string().optional(),
   image_url: z.string().optional().refine((val) => !val || val === "" || z.string().url().safeParse(val).success, {
@@ -83,7 +83,7 @@ export interface GraphNode {
   id: string;
   name: string;
   type: 'article' | 'claim' | 'source';
-  political_lean?: 'left' | 'center' | 'right';
+  political_lean?: 'left' | 'center' | 'right' | '';
   source_type?: 'primary' | 'secondary' | 'tertiary';
 }
 
