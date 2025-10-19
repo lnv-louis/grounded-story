@@ -6,11 +6,19 @@ import { SourceCard } from "@/components/SourceCard";
 import { ReactFlowGraph } from "@/components/ReactFlowGraph";
 import { MetricsCircles } from "@/components/MetricsCircles";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 
 import { AnalysisResult, GraphNode, GraphEdge } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { useScrollAnimation } from "@/hooks/useScrollAnimation";
 
 const Results = () => {
@@ -36,53 +44,63 @@ const Results = () => {
     return null;
   }
 
-  // Build graph data - filter out empty sources
-  const validSources = result.sources.filter(s => s.outlet_name && s.outlet_name.trim() !== '');
+  // Build graph data - filter out empty sources - memoized for performance
+  const validSources = useMemo(
+    () => result.sources.filter(s => s.outlet_name && s.outlet_name.trim() !== ''),
+    [result.sources]
+  );
   
-  const nodes: GraphNode[] = [
-    { id: 'article', name: result.topic, type: 'article' },
-    ...result.claims.map((claim, idx) => ({
-      id: `claim-${idx}`,
-      name: `Claim ${idx + 1}`,
-      type: 'claim' as const,
-    })),
-    ...validSources.map((source, idx) => ({
-      id: `source-${idx}`,
-      name: source.outlet_name,
-      type: 'source' as const,
-      political_lean: source.political_lean,
-      source_type: source.source_type,
-    })),
-  ];
+  const nodes: GraphNode[] = useMemo(
+    () => [
+      { id: 'article', name: result.topic, type: 'article' },
+      ...result.claims.map((claim, idx) => ({
+        id: `claim-${idx}`,
+        name: `Claim ${idx + 1}`,
+        type: 'claim' as const,
+      })),
+      ...validSources.map((source, idx) => ({
+        id: `source-${idx}`,
+        name: source.outlet_name,
+        type: 'source' as const,
+        political_lean: source.political_lean,
+        source_type: source.source_type,
+      })),
+    ],
+    [result.topic, result.claims, validSources]
+  );
 
-  const edges: GraphEdge[] = [
-    ...result.claims.map((_, idx) => ({
-      source: 'article',
-      target: `claim-${idx}`,
-      type: 'cites' as const,
-    })),
-    ...result.citations.map(citation => ({
-      source: `claim-${citation.claim_index}`,
-      target: `source-${citation.source_index}`,
-      type: 'cites' as const,
-    })),
-    ...result.edges.map(edge => ({
-      source: `source-${edge.source_index}`,
-      target: `source-${edge.target_index}`,
-      type: edge.edge_type,
-    })),
-  ];
+  const edges: GraphEdge[] = useMemo(
+    () => [
+      ...result.claims.map((_, idx) => ({
+        source: 'article',
+        target: `claim-${idx}`,
+        type: 'cites' as const,
+      })),
+      ...result.citations.map(citation => ({
+        source: `claim-${citation.claim_index}`,
+        target: `source-${citation.source_index}`,
+        type: 'cites' as const,
+      })),
+      ...result.edges.map(edge => ({
+        source: `source-${edge.source_index}`,
+        target: `source-${edge.target_index}`,
+        type: edge.edge_type,
+      })),
+    ],
+    [result.claims, result.citations, result.edges]
+  );
 
-  const handleShare = () => {
+  const handleShare = useCallback(() => {
     const url = window.location.href;
     navigator.clipboard.writeText(url);
     toast.success("Link copied to clipboard");
-  };
+  }, []);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/5">
       <header className="border-b border-border/50 bg-card/50 backdrop-blur-xl sticky top-0 z-50 shadow-lg">
-        <div className="container mx-auto px-6 py-4 flex items-center justify-between">
+        <div className="container mx-auto px-6 py-4">
+          <div className="flex items-center justify-between mb-4">
           <Button
             variant="ghost"
             size="sm"
@@ -121,6 +139,18 @@ const Results = () => {
               Share
             </Button>
           </div>
+          </div>
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink href="/">Home</BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>Results</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
       </header>
 

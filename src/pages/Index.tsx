@@ -96,13 +96,22 @@ const Index = () => {
               Contact Us
             </Button>
             {user ? (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={handleLogout}
-              >
-                Logout
-              </Button>
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => navigate('/profile')}
+                >
+                  Profile
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleLogout}
+                >
+                  Logout
+                </Button>
+              </>
             ) : (
               <Button
                 variant="outline"

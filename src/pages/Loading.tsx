@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
@@ -6,6 +6,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { AnalysisResultSchema } from "@/lib/types";
 import { toast } from "sonner";
 import logo from "@/assets/grounded-logo.png";
+import { useReportCache } from "@/hooks/useReportCache";
 
 const Loading = () => {
   const location = useLocation();
@@ -14,6 +15,8 @@ const Loading = () => {
   const [error, setError] = useState<string | null>(null);
   const [isApiComplete, setIsApiComplete] = useState(false);
   const [apiResult, setApiResult] = useState<any>(null);
+  const [user, setUser] = useState<any>(null);
+  const { getCachedReport, setCachedReport, saveReportToDatabase } = useReportCache();
   const [progressBars, setProgressBars] = useState({
     analyzing: 0,
     fetching: 0,
@@ -28,7 +31,21 @@ const Loading = () => {
       return;
     }
 
-    // Start the API call immediately
+    // Check auth state
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+    });
+
+    // Check cache first
+    const cached = getCachedReport(query);
+    if (cached) {
+      setApiResult(cached);
+      setIsApiComplete(true);
+      toast.success("Loaded from cache");
+      return;
+    }
+
+    // Start the API call
     const analyzeQuery = async () => {
       try {
         const { data, error } = await supabase.functions.invoke('analyze-query', {
@@ -41,6 +58,9 @@ const Loading = () => {
         const result = AnalysisResultSchema.parse(data);
         setApiResult(result);
         setIsApiComplete(true);
+        
+        // Cache the result
+        setCachedReport(query, result);
       } catch (err: any) {
         console.error('Analysis error:', err);
         setError(err.message || 'Failed to analyze query');
@@ -52,7 +72,7 @@ const Loading = () => {
     };
 
     analyzeQuery();
-  }, [query, navigate]);
+  }, [query, navigate, getCachedReport, setCachedReport]);
 
   // Animate progress bars independently
   useEffect(() => {
@@ -93,6 +113,11 @@ const Loading = () => {
   useEffect(() => {
     const allComplete = Object.values(progressBars).every(v => v >= 100);
     if (isApiComplete && allComplete && apiResult) {
+      // Save to database if user is logged in
+      if (user) {
+        saveReportToDatabase(query, apiResult, user.id);
+      }
+      
       setTimeout(() => {
         navigate('/results', { 
           state: { 
@@ -103,7 +128,7 @@ const Loading = () => {
         });
       }, 300);
     }
-  }, [isApiComplete, progressBars, apiResult, query, navigate]);
+  }, [isApiComplete, progressBars, apiResult, query, navigate, user, saveReportToDatabase]);
 
   return (
     <div className="min-h-screen bg-background flex items-center justify-center relative overflow-hidden">
